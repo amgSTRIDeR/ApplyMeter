@@ -1,0 +1,74 @@
+:host {
+  display: block;
+  flex-shrink: 0;
+}
+
+.app-header {
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 64px;
+  padding: 0 20px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e8e9ef;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: #1f2430;
+  text-decoration: none;
+}
+
+.app-header__logo {
+  display: grid;
+  place-items: center;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 9px;
+
+  background: #7657e8;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-header__title {
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-header__period {
+  color: #555b6a;
+}
+
+.app-header__chevron {
+  margin-left: 5px;
+}
+
+.app-header__settings {
+  color: #626878;
+
+  svg {
+    width: 20px;
+    height: 20px;
+
+    fill: currentColor;
+  }
+}

@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.settings-page {
+  padding: 20px;
+}
+
+.settings-page__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+  }
+}
