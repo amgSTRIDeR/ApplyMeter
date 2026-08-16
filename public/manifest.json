@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "ApplyMeter",
+  "version": "0.1.0",
+  "description": "Track job applications, interviews, offers and conversion metrics.",
+  "action": {
+    "default_title": "ApplyMeter",
+    "default_popup": "index.html"
+  }
+}
