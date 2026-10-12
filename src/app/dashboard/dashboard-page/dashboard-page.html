@@ -1,3 +1,39 @@
 <section class="dashboard-page">
-  Dashboard
+  @if (store.isLoading()) {
+    <p>Loading...</p>
+  } @else if (store.loadError()) {
+    <p role="alert">Failed to load dashboard data.</p>
+  } @else {
+    <h2>Dashboard</h2>
+
+    @if (store.saveError()) {
+      <p role="alert">Failed to save changes.</p>
+    }
+
+    @for (metric of store.metrics(); track metric.id) {
+      <div class="metric">
+        <span>
+          {{ metric.name }}:
+          {{ store.metricTotals().get(metric.id) ?? 0 }}
+        </span>
+
+        <button
+          type="button"
+          [attr.aria-label]="'Decrease ' + metric.name"
+          [disabled]="(store.metricTotals().get(metric.id) ?? 0) === 0"
+          (click)="store.decrementMetric(metric.id)"
+        >
+          −
+        </button>
+
+        <button
+          type="button"
+          [attr.aria-label]="'Increase ' + metric.name"
+          (click)="store.incrementMetric(metric.id)"
+        >
+          +
+        </button>
+      </div>
+    }
+  }
 </section>
