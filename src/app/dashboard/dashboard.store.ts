@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { ChromeStorage } from '../persistence/chrome-storage';
 import { createDefaultAppState } from './dashboard.defaults';
 import type {
+  Metric,
   MetricEvent,
   MetricId,
   PersistedAppState,
@@ -121,6 +122,135 @@ export class DashboardStore {
         ],
       },
     }));
+
+    this.persist();
+  }
+
+  addMetric(data: Pick<Metric, 'name' | 'icon' | 'color'>): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const name = data.name.trim();
+
+    if (!name) {
+      return;
+    }
+
+    const metric: Metric = {
+      id: crypto.randomUUID(),
+      name,
+      icon: data.icon,
+      color: data.color,
+      archived: false,
+    };
+
+    this.state.update((state) => ({
+      ...state,
+      metrics: [...state.metrics, metric],
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        metricOrder: [
+          ...state.dashboardConfig.metricOrder,
+          metric.id,
+        ],
+      },
+    }));
+
+    this.persist();
+  }
+
+  updateMetric(
+    metricId: MetricId,
+    data: Pick<Metric, 'name' | 'icon' | 'color'>,
+  ): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const name = data.name.trim();
+
+    if (!name) {
+      return;
+    }
+
+    const metricExists = this.state().metrics.some(
+      (metric) => metric.id === metricId && !metric.archived,
+    );
+
+    if (!metricExists) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      metrics: state.metrics.map((metric) =>
+        metric.id === metricId
+          ? {
+            ...metric,
+            name,
+            icon: data.icon,
+            color: data.color,
+          }
+          : metric,
+      ),
+    }));
+
+    this.persist();
+  }
+
+  archiveMetric(metricId: MetricId): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const metricExists = this.state().metrics.some(
+      (metric) => metric.id === metricId && !metric.archived,
+    );
+
+    if (!metricExists) {
+      return;
+    }
+
+    this.state.update((state) => {
+      const conversions = state.conversions.filter(
+        (conversion) =>
+          conversion.fromMetricId !== metricId &&
+          conversion.toMetricId !== metricId,
+      );
+
+      const conversionIds = new Set(
+        conversions.map((conversion) => conversion.id),
+      );
+
+      return {
+        ...state,
+
+        metrics: state.metrics.map((metric) =>
+          metric.id === metricId
+            ? { ...metric, archived: true }
+            : metric,
+        ),
+
+        conversions,
+
+        dashboardConfig: {
+          ...state.dashboardConfig,
+
+          metricOrder: state.dashboardConfig.metricOrder.filter(
+            (id) => id !== metricId,
+          ),
+
+          chartMetricIds: state.dashboardConfig.chartMetricIds.filter(
+            (id) => id !== metricId,
+          ),
+
+          conversionOrder: state.dashboardConfig.conversionOrder.filter(
+            (id) => conversionIds.has(id),
+          ),
+        },
+      };
+    });
 
     this.persist();
   }

@@ -1,0 +1,98 @@
+<form
+  class="metric-editor"
+  [formGroup]="form"
+  (ngSubmit)="save()"
+>
+  <h2 mat-dialog-title>
+    {{ metric ? 'Edit metric' : 'Add metric' }}
+  </h2>
+
+  <mat-dialog-content>
+    <div class="metric-editor__fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+
+        <input
+          matInput
+          formControlName="name"
+          maxlength="40"
+          placeholder="Metric name"
+        />
+
+        @if (form.controls.name.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+
+        @if (form.controls.name.hasError('maxlength')) {
+          <mat-error>Name is too long</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Icon</mat-label>
+
+        <mat-select formControlName="icon">
+          <mat-option value="send">
+            Send
+          </mat-option>
+
+          <mat-option value="groups">
+            People
+          </mat-option>
+
+          <mat-option value="work">
+            Work
+          </mat-option>
+
+          <mat-option value="close">
+            Close
+          </mat-option>
+
+          <mat-option value="chart">
+            Chart
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Color</mat-label>
+
+        <mat-select formControlName="color">
+          <mat-option value="#7657e8">
+            Purple
+          </mat-option>
+
+          <mat-option value="#4f7cff">
+            Blue
+          </mat-option>
+
+          <mat-option value="#27a36a">
+            Green
+          </mat-option>
+
+          <mat-option value="#dc5a5a">
+            Red
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
+
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="form.invalid"
+    >
+      {{ metric ? 'Save changes' : 'Add metric' }}
+    </button>
+  </mat-dialog-actions>
+</form>

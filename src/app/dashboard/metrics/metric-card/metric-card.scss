@@ -23,10 +23,9 @@
 .metric-card__header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
 
-  min-width: 0;
-  padding-right: 24px;
+  height: 32px;
 }
 
 .metric-card__icon {
@@ -59,8 +58,22 @@
   }
 }
 
+.metric-card__menu-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  color: #9398a6;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+}
+
 .metric-card__title {
-  min-width: 0;
+  margin-top: 6px;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -72,7 +85,7 @@
 }
 
 .metric-card__value {
-  margin-top: 18px;
+  margin-top: 6px;
 
   font-size: 34px;
   font-weight: 700;

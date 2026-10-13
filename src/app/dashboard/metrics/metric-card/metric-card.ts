@@ -4,13 +4,21 @@ import {
   input,
   output,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 
-import type { Metric, MetricId } from '../../dashboard.models';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+
+import type {
+  Metric,
+  MetricId,
+} from '../../dashboard.models';
 
 @Component({
   selector: 'app-metric-card',
-  imports: [MatButtonModule],
+  imports: [
+    MatButtonModule,
+    MatMenuModule,
+  ],
   templateUrl: './metric-card.html',
   styleUrl: './metric-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,4 +29,7 @@ export class MetricCard {
 
   readonly increment = output<MetricId>();
   readonly decrement = output<MetricId>();
+
+  readonly edit = output<Metric>();
+  readonly remove = output<Metric>();
 }

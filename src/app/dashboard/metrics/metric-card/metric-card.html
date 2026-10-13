@@ -44,12 +44,26 @@
       }
     </span>
 
-    <span
-      class="metric-card__title"
-      [attr.title]="metric().name"
+    <button
+      mat-icon-button
+      type="button"
+      class="metric-card__menu-button"
+      [matMenuTriggerFor]="metricMenu"
+      [attr.aria-label]="'Actions for ' + metric().name"
     >
-      {{ metric().name }}
-    </span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="5" r="1.5" />
+        <circle cx="12" cy="12" r="1.5" />
+        <circle cx="12" cy="19" r="1.5" />
+      </svg>
+    </button>
+  </div>
+
+  <div
+    class="metric-card__title"
+    [attr.title]="metric().name"
+  >
+    {{ metric().name }}
   </div>
 
   <div class="metric-card__value" aria-live="polite">
@@ -84,3 +98,19 @@
     </button>
   </div>
 </article>
+
+<mat-menu #metricMenu="matMenu">
+  <button
+    mat-menu-item
+    (click)="edit.emit(metric())"
+  >
+    Edit
+  </button>
+
+  <button
+    mat-menu-item
+    (click)="remove.emit(metric())"
+  >
+    Delete
+  </button>
+</mat-menu>
