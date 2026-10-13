@@ -150,3 +150,36 @@
 .conversion-panel__item.cdk-drag-placeholder {
   opacity: 0.3;
 }
+
+.conversion-panel__average {
+  margin-top: 8px;
+
+  font-size: 11px;
+  line-height: 1.5;
+  color: #555b6a;
+
+  strong {
+    font-weight: 600;
+    color: #202435;
+  }
+}
+
+.conversion-panel__forecast {
+  margin-top: 4px;
+
+  font-size: 11px;
+  line-height: 1.5;
+  color: #555b6a;
+
+  strong {
+    font-weight: 700;
+    color: #7657e8;
+  }
+}
+
+.conversion-panel__forecast-hint {
+  display: block;
+
+  font-size: 10px;
+  color: #858a99;
+}

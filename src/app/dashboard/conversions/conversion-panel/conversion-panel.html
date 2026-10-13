@@ -41,6 +41,37 @@
           <div class="conversion-panel__fraction">
             {{ conversion.toValue }} of {{ conversion.fromValue }}
           </div>
+          <div class="conversion-panel__average">
+            Average:
+
+            @if (conversion.averagePerResult !== null) {
+              <strong>
+                {{ conversion.averagePerResult }}
+              </strong>
+
+              {{ conversion.fromName }} per result
+            } @else {
+              —
+            }
+          </div>
+
+          <div class="conversion-panel__forecast">
+            Until next:
+
+            @if (conversion.remainingUntilNext !== null) {
+              <strong>
+                {{ conversion.remainingUntilNext }}
+              </strong>
+
+              {{ conversion.fromName }}
+
+              <span class="conversion-panel__forecast-hint">
+      (historical avg: {{ conversion.historicalAverage }})
+    </span>
+            } @else {
+              <span>Not enough history</span>
+            }
+          </div>
         </div>
 
         <div class="conversion-panel__percentage">

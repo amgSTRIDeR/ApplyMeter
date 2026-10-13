@@ -93,6 +93,11 @@ export class DashboardStore {
       ),
     );
 
+    const events = [...state.events].sort(
+      (a, b) =>
+        Date.parse(a.createdAt) - Date.parse(b.createdAt),
+    );
+
     return state.conversions
       .filter(
         (conversion) =>
@@ -111,16 +116,32 @@ export class DashboardStore {
         const fromValue = totals.get(conversion.fromMetricId) ?? 0;
         const toValue = totals.get(conversion.toMetricId) ?? 0;
 
+        const forecast = calculateConversionForecast(
+          events,
+          conversion.fromMetricId,
+          conversion.toMetricId,
+        );
+
         return {
           ...conversion,
+
           fromName: fromMetric.name,
           toName: toMetric.name,
+
           fromValue,
           toValue,
+
           percentage:
             fromValue > 0
               ? Math.round((toValue / fromValue) * 100)
               : null,
+
+          averagePerResult:
+            toValue > 0
+              ? Math.round((fromValue / toValue) * 10) / 10
+              : null,
+
+          ...forecast,
         };
       });
   });
@@ -566,4 +587,76 @@ export class DashboardStore {
         this.saveError.set(true);
       });
   }
+}
+
+function calculateConversionForecast(
+  events: MetricEvent[],
+  fromMetricId: MetricId,
+  toMetricId: MetricId,
+): {
+  historicalAverage: number | null;
+  remainingUntilNext: number | null;
+} {
+  const resultEventIndices: number[] = [];
+
+  for (let index = 0; index < events.length; index++) {
+    const event = events[index];
+
+    if (event.metricId !== toMetricId) {
+      continue;
+    }
+
+    if (event.delta > 0) {
+      for (let count = 0; count < event.delta; count++) {
+        resultEventIndices.push(index);
+      }
+    } else {
+      resultEventIndices.splice(
+        Math.max(0, resultEventIndices.length + event.delta),
+      );
+    }
+  }
+
+  if (resultEventIndices.length === 0) {
+    return {
+      historicalAverage: null,
+      remainingUntilNext: null,
+    };
+  }
+
+  let sourceSinceLastResult = 0;
+  let completedSourceTotal = 0;
+  let resultIndex = 0;
+
+  for (let index = 0; index < events.length; index++) {
+    const event = events[index];
+
+    if (event.metricId === fromMetricId) {
+      sourceSinceLastResult += event.delta;
+    }
+
+    while (resultEventIndices[resultIndex] === index) {
+      completedSourceTotal += sourceSinceLastResult;
+      sourceSinceLastResult = 0;
+      resultIndex++;
+    }
+  }
+
+  const historicalAverage =
+    completedSourceTotal / resultEventIndices.length;
+
+  if (historicalAverage <= 0) {
+    return {
+      historicalAverage: null,
+      remainingUntilNext: null,
+    };
+  }
+
+  return {
+    historicalAverage:
+      Math.round(historicalAverage * 10) / 10,
+
+    remainingUntilNext:
+      Math.ceil(historicalAverage) - sourceSinceLastResult,
+  };
 }
