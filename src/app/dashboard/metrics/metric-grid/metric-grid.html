@@ -1,11 +1,41 @@
-<div class="metric-grid">
+<div
+  class="metric-grid"
+  cdkDropList
+  cdkDropListOrientation="mixed"
+  (cdkDropListDropped)="onDrop($event)"
+>
   @for (metric of store.metrics(); track metric.id) {
-    <app-metric-card
-      [metric]="metric"
-      [value]="store.metricTotals().get(metric.id) ?? 0"
-      (increment)="store.incrementMetric($event)"
-      (decrement)="store.decrementMetric($event)"
-    />
+    <div
+      class="metric-grid__item"
+      cdkDrag
+    >
+      <button
+        type="button"
+        class="metric-grid__drag-handle"
+        cdkDragHandle
+        [attr.aria-label]="'Drag ' + metric.name"
+        [attr.title]="'Drag to reorder ' + metric.name"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle cx="9" cy="5" r="1.5" />
+          <circle cx="15" cy="5" r="1.5" />
+          <circle cx="9" cy="12" r="1.5" />
+          <circle cx="15" cy="12" r="1.5" />
+          <circle cx="9" cy="19" r="1.5" />
+          <circle cx="15" cy="19" r="1.5" />
+        </svg>
+      </button>
+
+      <app-metric-card
+        [metric]="metric"
+        [value]="store.metricTotals().get(metric.id) ?? 0"
+        (increment)="store.incrementMetric($event)"
+        (decrement)="store.decrementMetric($event)"
+      />
+    </div>
   } @empty {
     <p class="metric-grid__empty">
       No metrics available.

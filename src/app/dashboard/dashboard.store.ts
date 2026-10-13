@@ -86,6 +86,45 @@ export class DashboardStore {
     this.changeMetric(metricId, -1);
   }
 
+  reorderMetrics(previousIndex: number, currentIndex: number): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const metricIds = this.metrics().map((metric) => metric.id);
+
+    if (
+      previousIndex === currentIndex ||
+      previousIndex < 0 ||
+      currentIndex < 0 ||
+      previousIndex >= metricIds.length ||
+      currentIndex >= metricIds.length
+    ) {
+      return;
+    }
+
+    const [movedMetricId] = metricIds.splice(previousIndex, 1);
+
+    metricIds.splice(currentIndex, 0, movedMetricId);
+
+    const visibleIds = new Set(metricIds);
+
+    this.state.update((state) => ({
+      ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        metricOrder: [
+          ...metricIds,
+          ...state.dashboardConfig.metricOrder.filter(
+            (id) => !visibleIds.has(id),
+          ),
+        ],
+      },
+    }));
+
+    this.persist();
+  }
+
   private changeMetric(metricId: MetricId, delta: number): void {
     if (this.isLoading() || this.loadError()) {
       return;

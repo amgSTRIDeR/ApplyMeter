@@ -8,6 +8,66 @@
   gap: 12px;
 }
 
+.metric-grid__item {
+  position: relative;
+  min-width: 0;
+}
+
+.metric-grid__drag-handle {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 28px;
+  padding: 3px;
+
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+
+  color: #9398a6;
+  cursor: grab;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  &:hover {
+    background: #f0edff;
+    color: #7657e8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7657e8;
+    outline-offset: 2px;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.metric-grid__item.cdk-drag-preview {
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 15%);
+}
+
+.metric-grid__item.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
 .metric-grid__empty {
   grid-column: 1 / -1;
 
