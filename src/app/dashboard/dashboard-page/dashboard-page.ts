@@ -5,11 +5,16 @@ import {
 } from '@angular/core';
 
 import { DashboardStore } from '../dashboard.store';
+
 import { MetricGrid } from '../metrics/metric-grid/metric-grid';
+import { ConversionPanel } from '../conversions/conversion-panel/conversion-panel';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [MetricGrid],
+  imports: [
+    MetricGrid,
+    ConversionPanel,
+  ],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

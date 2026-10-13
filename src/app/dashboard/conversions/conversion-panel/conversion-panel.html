@@ -1,0 +1,100 @@
+<section class="conversion-panel">
+  <header class="conversion-panel__header">
+    <h2>Conversions</h2>
+  </header>
+
+  <div
+    class="conversion-panel__list"
+    cdkDropList
+    cdkDropListOrientation="vertical"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (conversion of store.conversionRows(); track conversion.id) {
+      <div
+        class="conversion-panel__item"
+        cdkDrag
+      >
+        <button
+          type="button"
+          class="conversion-panel__handle"
+          cdkDragHandle
+          [attr.aria-label]="'Drag ' + conversion.fromName + ' to ' + conversion.toName"
+          title="Drag to reorder"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="9" cy="5" r="1.5" />
+            <circle cx="15" cy="5" r="1.5" />
+            <circle cx="9" cy="12" r="1.5" />
+            <circle cx="15" cy="12" r="1.5" />
+            <circle cx="9" cy="19" r="1.5" />
+            <circle cx="15" cy="19" r="1.5" />
+          </svg>
+        </button>
+
+        <div class="conversion-panel__details">
+          <div class="conversion-panel__name">
+            {{ conversion.fromName }}
+            →
+            {{ conversion.toName }}
+          </div>
+
+          <div class="conversion-panel__fraction">
+            {{ conversion.toValue }} of {{ conversion.fromValue }}
+          </div>
+        </div>
+
+        <div class="conversion-panel__percentage">
+          {{
+            conversion.percentage === null
+              ? '—'
+              : conversion.percentage + '%'
+          }}
+        </div>
+
+        <button
+          mat-icon-button
+          type="button"
+          class="conversion-panel__menu-button"
+          [matMenuTriggerFor]="conversionMenu"
+          [attr.aria-label]="'Actions for ' + conversion.fromName + ' to ' + conversion.toName"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="5" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="12" cy="19" r="1.5" />
+          </svg>
+        </button>
+
+        <mat-menu #conversionMenu="matMenu">
+          <button
+            mat-menu-item
+            (click)="openEditor(conversion)"
+          >
+            Edit
+          </button>
+
+          <button
+            mat-menu-item
+            (click)="deleteConversion(conversion.id)"
+          >
+            Delete
+          </button>
+        </mat-menu>
+      </div>
+    } @empty {
+      <p class="conversion-panel__empty">
+        No conversions yet.
+      </p>
+    }
+  </div>
+
+  <button
+    mat-button
+    type="button"
+    class="conversion-panel__add"
+    [disabled]="store.metrics().length < 2"
+    (click)="openEditor()"
+  >
+    + Add conversion
+  </button>
+</section>

@@ -1,0 +1,152 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.conversion-panel {
+  box-sizing: border-box;
+
+  padding: 16px;
+
+  background: #ffffff;
+  border: 1px solid #e8e9ef;
+  border-radius: 12px;
+
+  box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+}
+
+.conversion-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 600;
+    color: #202435;
+  }
+}
+
+.conversion-panel__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conversion-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  min-height: 64px;
+  padding: 6px;
+
+  background: #fafafd;
+  border: 1px solid #edeef3;
+  border-radius: 8px;
+}
+
+.conversion-panel__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 20px;
+  height: 28px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #9398a6;
+  cursor: grab;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7657e8;
+    outline-offset: 2px;
+  }
+}
+
+.conversion-panel__details {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversion-panel__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #404655;
+
+  overflow-wrap: anywhere;
+}
+
+.conversion-panel__fraction {
+  margin-top: 4px;
+
+  font-size: 11px;
+  color: #858a99;
+}
+
+.conversion-panel__percentage {
+  flex-shrink: 0;
+
+  font-size: 16px;
+  font-weight: 700;
+  color: #7657e8;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.conversion-panel__menu-button {
+  flex-shrink: 0;
+
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  color: #9398a6;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+}
+
+.conversion-panel__add {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.conversion-panel__empty {
+  margin: 0;
+  padding: 12px;
+
+  text-align: center;
+  color: #858a99;
+
+  font-size: 13px;
+}
+
+.conversion-panel__item.cdk-drag-preview {
+  box-shadow: 0 10px 24px rgb(0 0 0 / 12%);
+}
+
+.conversion-panel__item.cdk-drag-placeholder {
+  opacity: 0.3;
+}

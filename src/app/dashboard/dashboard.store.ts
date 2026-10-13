@@ -3,6 +3,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { ChromeStorage } from '../persistence/chrome-storage';
 import { createDefaultAppState } from './dashboard.defaults';
 import type {
+  Conversion,
+  ConversionId,
   Metric,
   MetricEvent,
   MetricId,
@@ -59,6 +61,54 @@ export class DashboardStore {
     }
 
     return totals;
+  });
+
+  readonly conversionRows = computed(() => {
+    const state = this.state();
+    const totals = this.metricTotals();
+
+    const metrics = new Map(
+      state.metrics
+        .filter((metric) => !metric.archived)
+        .map((metric) => [metric.id, metric] as const),
+    );
+
+    const order = new Map(
+      state.dashboardConfig.conversionOrder.map(
+        (id, index) => [id, index] as const,
+      ),
+    );
+
+    return state.conversions
+      .filter(
+        (conversion) =>
+          metrics.has(conversion.fromMetricId) &&
+          metrics.has(conversion.toMetricId),
+      )
+      .sort(
+        (a, b) =>
+          (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+          (order.get(b.id) ?? Number.MAX_SAFE_INTEGER),
+      )
+      .map((conversion) => {
+        const fromMetric = metrics.get(conversion.fromMetricId)!;
+        const toMetric = metrics.get(conversion.toMetricId)!;
+
+        const fromValue = totals.get(conversion.fromMetricId) ?? 0;
+        const toValue = totals.get(conversion.toMetricId) ?? 0;
+
+        return {
+          ...conversion,
+          fromName: fromMetric.name,
+          toName: toMetric.name,
+          fromValue,
+          toValue,
+          percentage:
+            fromValue > 0
+              ? Math.round((toValue / fromValue) * 100)
+              : null,
+        };
+      });
   });
 
   private saveQueue: Promise<void> = Promise.resolve();
@@ -253,6 +303,162 @@ export class DashboardStore {
     });
 
     this.persist();
+  }
+
+  addConversion(
+    data: Pick<Conversion, 'fromMetricId' | 'toMetricId'>,
+  ): void {
+    if (
+      this.isLoading() ||
+      this.loadError() ||
+      !this.isValidConversion(data)
+    ) {
+      return;
+    }
+
+    const conversion: Conversion = {
+      id: crypto.randomUUID(),
+      ...data,
+    };
+
+    this.state.update((state) => ({
+      ...state,
+      conversions: [...state.conversions, conversion],
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        conversionOrder: [
+          ...state.dashboardConfig.conversionOrder,
+          conversion.id,
+        ],
+      },
+    }));
+
+    this.persist();
+  }
+
+  updateConversion(
+    conversionId: ConversionId,
+    data: Pick<Conversion, 'fromMetricId' | 'toMetricId'>,
+  ): void {
+    if (
+      this.isLoading() ||
+      this.loadError() ||
+      !this.isValidConversion(data, conversionId)
+    ) {
+      return;
+    }
+
+    const exists = this.state().conversions.some(
+      (conversion) => conversion.id === conversionId,
+    );
+
+    if (!exists) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      conversions: state.conversions.map((conversion) =>
+        conversion.id === conversionId
+          ? { ...conversion, ...data }
+          : conversion,
+      ),
+    }));
+
+    this.persist();
+  }
+
+  deleteConversion(conversionId: ConversionId): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const exists = this.state().conversions.some(
+      (conversion) => conversion.id === conversionId,
+    );
+
+    if (!exists) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+
+      conversions: state.conversions.filter(
+        (conversion) => conversion.id !== conversionId,
+      ),
+
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        conversionOrder: state.dashboardConfig.conversionOrder.filter(
+          (id) => id !== conversionId,
+        ),
+      },
+    }));
+
+    this.persist();
+  }
+
+  reorderConversions(
+    previousIndex: number,
+    currentIndex: number,
+  ): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const ids = this.conversionRows().map(
+      (conversion) => conversion.id,
+    );
+
+    if (
+      previousIndex === currentIndex ||
+      previousIndex < 0 ||
+      currentIndex < 0 ||
+      previousIndex >= ids.length ||
+      currentIndex >= ids.length
+    ) {
+      return;
+    }
+
+    const [movedId] = ids.splice(previousIndex, 1);
+
+    ids.splice(currentIndex, 0, movedId);
+
+    this.state.update((state) => ({
+      ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        conversionOrder: ids,
+      },
+    }));
+
+    this.persist();
+  }
+
+  private isValidConversion(
+    data: Pick<Conversion, 'fromMetricId' | 'toMetricId'>,
+    excludedId?: ConversionId,
+  ): boolean {
+    const state = this.state();
+
+    const activeIds = new Set(
+      state.metrics
+        .filter((metric) => !metric.archived)
+        .map((metric) => metric.id),
+    );
+
+    return (
+      data.fromMetricId !== data.toMetricId &&
+      activeIds.has(data.fromMetricId) &&
+      activeIds.has(data.toMetricId) &&
+      !state.conversions.some(
+        (conversion) =>
+          conversion.id !== excludedId &&
+          conversion.fromMetricId === data.fromMetricId &&
+          conversion.toMetricId === data.toMetricId,
+      )
+    );
   }
 
   private changeMetric(metricId: MetricId, delta: number): void {

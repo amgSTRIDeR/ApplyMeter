@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.conversion-editor {
+  width: 100%;
+}
+
+.conversion-editor__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding-top: 8px;
+}
+
+.conversion-editor__error {
+  margin: 0;
+
+  color: #b42318;
+  font-size: 13px;
+}
+
+mat-form-field {
+  width: 100%;
+}
