@@ -1,7 +1,28 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 .dashboard-page {
   padding: 20px;
+}
+
+.dashboard-page__message {
+  margin: 0;
+  padding: 24px 0;
+
+  text-align: center;
+  color: #777d8c;
+}
+
+.dashboard-page__error {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+
+  font-size: 13px;
 }

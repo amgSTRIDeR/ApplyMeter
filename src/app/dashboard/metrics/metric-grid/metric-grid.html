@@ -1,0 +1,14 @@
+<div class="metric-grid">
+  @for (metric of store.metrics(); track metric.id) {
+    <app-metric-card
+      [metric]="metric"
+      [value]="store.metricTotals().get(metric.id) ?? 0"
+      (increment)="store.incrementMetric($event)"
+      (decrement)="store.decrementMetric($event)"
+    />
+  } @empty {
+    <p class="metric-grid__empty">
+      No metrics available.
+    </p>
+  }
+</div>

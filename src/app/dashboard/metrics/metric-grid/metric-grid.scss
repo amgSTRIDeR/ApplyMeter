@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-grid__empty {
+  grid-column: 1 / -1;
+
+  margin: 0;
+  padding: 24px;
+
+  text-align: center;
+  color: #777d8c;
+}

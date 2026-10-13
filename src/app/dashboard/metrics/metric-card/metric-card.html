@@ -1,0 +1,86 @@
+<article
+  class="metric-card"
+  [style.--metric-color]="metric().color"
+>
+  <div class="metric-card__header">
+    <span class="metric-card__icon" aria-hidden="true">
+      @switch (metric().icon) {
+        @case ('send') {
+          <svg viewBox="0 0 24 24">
+            <path d="m22 2-7 20-4-9-9-4Z" />
+            <path d="M22 2 11 13" />
+          </svg>
+        }
+
+        @case ('groups') {
+          <svg viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        }
+
+        @case ('work') {
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="14" rx="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+          </svg>
+        }
+
+        @case ('close') {
+          <svg viewBox="0 0 24 24">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        }
+
+        @default {
+          <svg viewBox="0 0 24 24">
+            <path d="M3 3v18h18" />
+            <path d="m7 16 5-5 4 3 5-7" />
+          </svg>
+        }
+      }
+    </span>
+
+    <span
+      class="metric-card__title"
+      [attr.title]="metric().name"
+    >
+      {{ metric().name }}
+    </span>
+  </div>
+
+  <div class="metric-card__value" aria-live="polite">
+    {{ value() }}
+  </div>
+
+  <div class="metric-card__actions">
+    <button
+      mat-icon-button
+      type="button"
+      class="metric-card__action metric-card__action--minus"
+      [disabled]="value() === 0"
+      [attr.aria-label]="'Decrease ' + metric().name"
+      (click)="decrement.emit(metric().id)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14" />
+      </svg>
+    </button>
+
+    <button
+      mat-icon-button
+      type="button"
+      class="metric-card__action metric-card__action--plus"
+      [attr.aria-label]="'Increase ' + metric().name"
+      (click)="increment.emit(metric().id)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14" />
+        <path d="M5 12h14" />
+      </svg>
+    </button>
+  </div>
+</article>
