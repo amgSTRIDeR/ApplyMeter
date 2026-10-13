@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-
+import { buildActivityChartData } from './dashboard.aggregations';
 import { ChromeStorage } from '../persistence/chrome-storage';
 import { createDefaultAppState } from './dashboard.defaults';
 import type {
@@ -61,6 +61,20 @@ export class DashboardStore {
     }
 
     return totals;
+  });
+
+  readonly chartMetricIds = computed(
+    () => this.state().dashboardConfig.chartMetricIds,
+  );
+
+  readonly chartData = computed(() => {
+    const state = this.state();
+
+    return buildActivityChartData(
+      state.metrics,
+      state.events,
+      state.dashboardConfig.chartMetricIds,
+    );
   });
 
   readonly conversionRows = computed(() => {
@@ -459,6 +473,51 @@ export class DashboardStore {
           conversion.toMetricId === data.toMetricId,
       )
     );
+  }
+
+  setChartMetrics(metricIds: MetricId[]): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const activeIds = new Set(
+      this.metrics().map((metric) => metric.id),
+    );
+
+    const selectedIds = [...new Set(metricIds)].filter(
+      (id) => activeIds.has(id),
+    );
+
+    this.state.update((state) => ({
+      ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        chartMetricIds: selectedIds,
+      },
+    }));
+
+    this.persist();
+  }
+
+  exportData(): PersistedAppState {
+    if (this.isLoading() || this.loadError()) {
+      throw new Error('Dashboard is not ready.');
+    }
+
+    return structuredClone(this.state());
+  }
+
+  async importData(data: PersistedAppState): Promise<void> {
+    if (this.isLoading() || this.loadError()) {
+      throw new Error('Dashboard is not ready.');
+    }
+
+    await this.saveQueue;
+
+    await this.storage.save(data);
+
+    this.state.set(data);
+    this.saveError.set(false);
   }
 
   private changeMetric(metricId: MetricId, delta: number): void {

@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.chart-settings__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  min-width: 220px;
+  padding: 8px 0;
+}
+
+.chart-settings__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.chart-settings__color {
+  display: block;
+  flex-shrink: 0;
+
+  width: 12px;
+  height: 12px;
+
+  border-radius: 50%;
+}

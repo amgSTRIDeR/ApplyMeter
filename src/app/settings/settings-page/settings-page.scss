@@ -1,8 +1,10 @@
 :host {
   display: block;
+  min-width: 0;
 }
 
 .settings-page {
+  box-sizing: border-box;
   padding: 20px;
 }
 
@@ -11,7 +13,57 @@
   align-items: center;
   gap: 12px;
 
+  margin-bottom: 24px;
+
   h2 {
     margin: 0;
+
+    font-size: 20px;
+    font-weight: 600;
+    color: #202435;
   }
+}
+
+.settings-page__section {
+  padding: 20px;
+
+  background: #ffffff;
+  border: 1px solid #e8e9ef;
+  border-radius: 12px;
+
+  h3 {
+    margin: 0 0 12px;
+
+    font-size: 16px;
+    font-weight: 600;
+    color: #202435;
+  }
+}
+
+.settings-page__description {
+  margin: 0 0 20px;
+
+  font-size: 13px;
+  line-height: 1.5;
+  color: #555b6a;
+}
+
+.settings-page__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-page__success,
+.settings-page__error {
+  margin: 16px 0 0;
+  font-size: 13px;
+}
+
+.settings-page__success {
+  color: #21845b;
+}
+
+.settings-page__error {
+  color: #b42318;
 }

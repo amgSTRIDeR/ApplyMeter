@@ -1,14 +1,98 @@
 <section class="settings-page">
-  <div class="settings-page__header">
-    <a
-      mat-button
-      routerLink="/"
-    >
+  <header class="settings-page__header">
+    <a mat-button routerLink="/">
       ← Back
     </a>
 
-    <h2>
-      Settings
-    </h2>
-  </div>
+    <h2>Settings</h2>
+  </header>
+
+  <section class="settings-page__section">
+    <h3>Backup & Restore</h3>
+
+    <p class="settings-page__description">
+      Export all your ApplyMeter data, including metrics,
+      activity history, conversions, and dashboard settings.
+    </p>
+
+    <div class="settings-page__actions">
+      <button
+        mat-stroked-button
+        type="button"
+        [disabled]="store.isLoading() || store.loadError() || isImporting()"
+        (click)="exportData()"
+      >
+        Export data
+      </button>
+
+      <input
+        #backupFile
+        type="file"
+        accept=".json,application/json"
+        hidden
+        (change)="onFileSelected($event)"
+      />
+
+      <button
+        mat-flat-button
+        type="button"
+        [disabled]="store.isLoading() || store.loadError() || isImporting()"
+        (click)="backupFile.click()"
+      >
+        {{ isImporting() ? 'Importing...' : 'Import data' }}
+      </button>
+    </div>
+
+    @if (successMessage()) {
+      <p class="settings-page__success" role="status">
+        {{ successMessage() }}
+      </p>
+    }
+
+    @if (errorMessage()) {
+      <p class="settings-page__error" role="alert">
+        {{ errorMessage() }}
+      </p>
+    }
+  </section>
 </section>
+
+<ng-template #confirmImport>
+  <h2 mat-dialog-title>
+    Restore backup?
+  </h2>
+
+  <mat-dialog-content>
+    <p>
+      Importing this backup will replace all current
+      ApplyMeter data.
+    </p>
+
+    <p>
+      This includes your metrics, activity history,
+      conversions, and dashboard settings.
+    </p>
+
+    <p>
+      Export your current data first if you want to keep it.
+    </p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      mat-dialog-close
+    >
+      Cancel
+    </button>
+
+    <button
+      mat-flat-button
+      type="button"
+      [mat-dialog-close]="true"
+    >
+      Import
+    </button>
+  </mat-dialog-actions>
+</ng-template>

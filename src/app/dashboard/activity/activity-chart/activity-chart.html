@@ -1,0 +1,54 @@
+<section class="activity-chart">
+  <header class="activity-chart__header">
+    <h2>Activity</h2>
+
+    <button
+      mat-icon-button
+      type="button"
+      aria-label="Configure chart lines"
+      title="Configure chart lines"
+      (click)="openSettings()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M4 7h16" />
+        <circle cx="9" cy="7" r="2" />
+        <path d="M4 17h16" />
+        <circle cx="15" cy="17" r="2" />
+      </svg>
+    </button>
+  </header>
+
+  <p class="activity-chart__description">
+    Daily net changes · All time
+  </p>
+
+  <div class="activity-chart__plot">
+    <canvas
+      #chartCanvas
+      role="img"
+      aria-label="Daily metric activity chart"
+    ></canvas>
+
+    @if (store.chartMetricIds().length === 0) {
+      <div class="activity-chart__empty">
+        Select metrics to display chart lines.
+      </div>
+    }
+  </div>
+
+  <div class="activity-chart__legend">
+    @for (metric of store.chartData().series; track metric.id) {
+      <div class="activity-chart__legend-item">
+        <span
+          class="activity-chart__legend-color"
+          [style.backgroundColor]="metric.color"
+        ></span>
+
+        <span>{{ metric.name }}</span>
+      </div>
+    }
+  </div>
+</section>

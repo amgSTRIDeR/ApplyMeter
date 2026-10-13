@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>
+  Chart lines
+</h2>
+
+<mat-dialog-content>
+  <div class="chart-settings__list">
+    @for (metric of data.metrics; track metric.id) {
+      <div class="chart-settings__item">
+        <mat-checkbox
+          [checked]="selectedIds().includes(metric.id)"
+          (change)="toggleMetric(metric.id, $event.checked)"
+        >
+          {{ metric.name }}
+        </mat-checkbox>
+
+        <span
+          class="chart-settings__color"
+          [style.backgroundColor]="metric.color"
+        ></span>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-button
+    type="button"
+    (click)="cancel()"
+  >
+    Cancel
+  </button>
+
+  <button
+    mat-flat-button
+    type="button"
+    (click)="save()"
+  >
+    Save
+  </button>
+</mat-dialog-actions>

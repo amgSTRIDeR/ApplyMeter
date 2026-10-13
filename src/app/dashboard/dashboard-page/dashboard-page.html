@@ -1,7 +1,7 @@
 <section class="dashboard-page">
   @if (store.isLoading()) {
     <p class="dashboard-page__message" role="status">
-      Loading metrics...
+      Loading dashboard...
     </p>
   } @else if (store.loadError()) {
     <p class="dashboard-page__error" role="alert">
@@ -16,7 +16,9 @@
 
     <app-metric-grid />
 
-    <div class="dashboard-page__conversions">
+    <div class="dashboard-page__panels">
+      <app-activity-chart />
+
       <app-conversion-panel />
     </div>
   }
