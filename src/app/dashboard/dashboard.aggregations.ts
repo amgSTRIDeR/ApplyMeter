@@ -91,3 +91,18 @@ export function buildActivityChartData(
     })),
   };
 }
+
+export function normalizeChartSeries(values: number[]): number[] {
+  const maximumMagnitude = values.reduce(
+    (maximum, value) => Math.max(maximum, Math.abs(value)),
+    0,
+  );
+
+  if (maximumMagnitude === 0) {
+    return values.map(() => 0);
+  }
+
+  return values.map(
+    (value) => Math.round((value / maximumMagnitude) * 1000) / 10,
+  );
+}

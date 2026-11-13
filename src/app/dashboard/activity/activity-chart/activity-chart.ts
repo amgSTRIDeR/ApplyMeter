@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import Chart from 'chart.js/auto';
 import type { ChartDataset, Plugin } from 'chart.js';
 
+import { normalizeChartSeries } from '../../dashboard.aggregations';
 import { DashboardStore } from '../../dashboard.store';
 import type { MetricId } from '../../dashboard.models';
 
@@ -90,7 +91,7 @@ export class ActivityChart implements OnDestroy {
 
       const datasets = series.map((metric) => ({
         label: metric.name,
-        data: metric.values,
+        data: normalizeChartSeries(metric.values),
         borderColor: metric.color,
         backgroundColor: metric.color,
         borderWidth: 2,
@@ -147,10 +148,17 @@ export class ActivityChart implements OnDestroy {
               },
               tooltip: {
                 callbacks: {
-                  label: (context) =>
-                    context.dataset.yAxisID === 'yMarkers'
-                      ? context.dataset.label ?? ''
-                      : `${context.dataset.label}: ${context.formattedValue}`,
+                  label: (context) => {
+                    if (context.dataset.yAxisID === 'yMarkers') {
+                      return context.dataset.label ?? '';
+                    }
+
+                    const metric = series[context.datasetIndex];
+                    const originalValue =
+                      metric.values[context.dataIndex];
+
+                    return `${context.dataset.label}: ${originalValue} (${context.formattedValue}%)`;
+                  },
                 },
               },
             },
@@ -168,6 +176,7 @@ export class ActivityChart implements OnDestroy {
                 beginAtZero: true,
                 ticks: {
                   precision: 0,
+                  callback: (value) => `${value}%`,
                 },
               },
               yMarkers: {
