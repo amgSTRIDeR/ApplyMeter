@@ -5,6 +5,10 @@
   "service": "app-dev",
   "workspaceFolder": "/app",
 
+  "mounts": [
+    "source=${localEnv:HOME}/.copilot/copilot-instructions.md,target=/root/.copilot/copilot-instructions.md,type=bind,readonly"
+  ],
+
   "overrideCommand": false,
   "shutdownAction": "stopCompose",
 
@@ -17,7 +21,7 @@
 
   "waitFor": "postCreateCommand",
 
-  "postCreateCommand": "if [ -f package-lock.json ]; then npm ci; elif [ -f yarn.lock ]; then yarn install; else npm install; fi",
+  "postCreateCommand": "if [ -f package.json ]; then if [ -f package-lock.json ]; then npm ci; elif [ -f yarn.lock ]; then yarn install; else npm install; fi; fi",
 
   "customizations": {
     "jetbrains": {

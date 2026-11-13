@@ -22,6 +22,7 @@ services:
 
     environment:
       NODE_ENV: development
+      NG_CLI_ANALYTICS: "false"
 
 volumes:
   app_node_modules:
