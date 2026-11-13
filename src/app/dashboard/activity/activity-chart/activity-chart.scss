@@ -39,11 +39,35 @@
   align-items: center;
   gap: 4px;
 
+  select {
+    max-width: 90px;
+    height: 32px;
+    padding: 0 6px;
+
+    border: 1px solid #e8e9ef;
+    border-radius: 6px;
+    background: #ffffff;
+
+    color: #555b6a;
+    font: inherit;
+    font-size: 11px;
+  }
+
   button[mat-icon-button] {
     width: 32px;
     height: 32px;
 
     color: #777d8c;
+  }
+
+  .activity-chart__visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   svg {

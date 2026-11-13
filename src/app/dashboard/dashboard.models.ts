@@ -37,7 +37,16 @@ export interface Conversion {
   toMetricId: MetricId;
 }
 
-export type DashboardPeriod = 'all';
+export type DashboardPeriod = '7d' | '30d' | '90d' | 'all';
+
+export function isDashboardPeriod(value: unknown): value is DashboardPeriod {
+  return (
+    value === '7d' ||
+    value === '30d' ||
+    value === '90d' ||
+    value === 'all'
+  );
+}
 
 export interface DashboardConfig {
   metricOrder: MetricId[];

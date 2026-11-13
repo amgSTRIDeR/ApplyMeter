@@ -3,6 +3,22 @@
     <h2>Activity</h2>
 
     <div class="activity-chart__actions">
+      <label class="activity-chart__period">
+        <span class="activity-chart__visually-hidden">
+          Chart period
+        </span>
+        <select
+          [value]="store.chartPeriod()"
+          aria-label="Chart period"
+          (change)="changePeriod($event)"
+        >
+          <option value="7d">Last 7 days</option>
+          <option value="30d">Last 30 days</option>
+          <option value="90d">Last 90 days</option>
+          <option value="all">All time</option>
+        </select>
+      </label>
+
       <button
         mat-button
         type="button"

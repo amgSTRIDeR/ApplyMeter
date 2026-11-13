@@ -18,6 +18,7 @@ import {
 
 import { CURRENT_SCHEMA_VERSION } from '../../dashboard/dashboard.defaults';
 import { parseLocalDate } from '../../dashboard/date-utils';
+import { isDashboardPeriod } from '../../dashboard/dashboard.models';
 import { DashboardStore } from '../../dashboard/dashboard.store';
 import type { PersistedAppState } from '../../dashboard/dashboard.models';
 
@@ -279,6 +280,7 @@ function isValidBackup(value: unknown): value is PersistedAppState {
   const metricOrder = config['metricOrder'];
   const chartMetricIds = config['chartMetricIds'];
   const conversionOrder = config['conversionOrder'];
+  const period = config['period'];
 
   if (
     !isUniqueStringArray(metricOrder) ||
@@ -289,7 +291,7 @@ function isValidBackup(value: unknown): value is PersistedAppState {
   }
 
   return (
-    config['period'] === 'all' &&
+    isDashboardPeriod(period) &&
     metricOrder.every((id) => metricIds.has(id)) &&
     [...activeIds].every((id) => metricOrder.includes(id)) &&
     chartMetricIds.every((id) => activeIds.has(id)) &&

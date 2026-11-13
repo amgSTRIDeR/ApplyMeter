@@ -1,5 +1,6 @@
 import type {
   ChartMarker,
+  DashboardPeriod,
   Metric,
   MetricEvent,
   MetricId,
@@ -11,6 +12,7 @@ export function buildActivityChartData(
   events: MetricEvent[],
   selectedIds: MetricId[],
   chartMarkers: ChartMarker[] = [],
+  period: DashboardPeriod = 'all',
 ) {
   const selectedMetrics = selectedIds
     .map((id) => metrics.find((metric) => metric.id === id))
@@ -19,23 +21,32 @@ export function buildActivityChartData(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const periodDays: Record<DashboardPeriod, number | null> = {
+    '7d': 7,
+    '30d': 30,
+    '90d': 90,
+    all: null,
+  };
+  const visibleDayCount = periodDays[period] ?? 7;
   const firstDay = new Date(today);
-  firstDay.setDate(firstDay.getDate() - 6);
+  firstDay.setDate(firstDay.getDate() - visibleDayCount + 1);
 
-  for (const event of events) {
-    const date = new Date(event.createdAt);
-    date.setHours(0, 0, 0, 0);
+  if (period === 'all') {
+    for (const event of events) {
+      const date = new Date(event.createdAt);
+      date.setHours(0, 0, 0, 0);
 
-    if (date < firstDay) {
-      firstDay.setTime(date.getTime());
+      if (date < firstDay) {
+        firstDay.setTime(date.getTime());
+      }
     }
-  }
 
-  for (const marker of chartMarkers) {
-    const date = parseLocalDate(marker.date);
+    for (const marker of chartMarkers) {
+      const date = parseLocalDate(marker.date);
 
-    if (date && date < firstDay) {
-      firstDay.setTime(date.getTime());
+      if (date && date < firstDay) {
+        firstDay.setTime(date.getTime());
+      }
     }
   }
 

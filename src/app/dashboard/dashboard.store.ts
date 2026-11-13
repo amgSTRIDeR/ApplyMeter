@@ -6,11 +6,13 @@ import {
   createDefaultAppState,
   DEFAULT_CHART_MARKER_COLOR,
 } from './dashboard.defaults';
+import { isDashboardPeriod } from './dashboard.models';
 import type {
   ChartMarker,
   ChartMarkerData,
   Conversion,
   ConversionId,
+  DashboardPeriod,
   Metric,
   MetricEvent,
   MetricId,
@@ -73,6 +75,10 @@ export class DashboardStore {
     () => this.state().dashboardConfig.chartMetricIds,
   );
 
+  readonly chartPeriod = computed(
+    () => this.state().dashboardConfig.period,
+  );
+
   readonly chartMarkers = computed(
     () =>
       (this.state().chartMarkers ?? []).map((marker) => ({
@@ -89,6 +95,7 @@ export class DashboardStore {
       state.events,
       state.dashboardConfig.chartMetricIds,
       state.chartMarkers ?? [],
+      state.dashboardConfig.period,
     );
   });
 
@@ -529,6 +536,26 @@ export class DashboardStore {
       dashboardConfig: {
         ...state.dashboardConfig,
         chartMetricIds: selectedIds,
+      },
+    }));
+
+    this.persist();
+  }
+
+  setChartPeriod(period: DashboardPeriod): void {
+    if (
+      this.isLoading() ||
+      this.loadError() ||
+      !isDashboardPeriod(period)
+    ) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        period,
       },
     }));
 

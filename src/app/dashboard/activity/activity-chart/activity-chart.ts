@@ -16,6 +16,7 @@ import type { ChartDataset, Plugin } from 'chart.js';
 
 import { normalizeChartSeries } from '../../dashboard.aggregations';
 import { DEFAULT_CHART_MARKER_COLOR } from '../../dashboard.defaults';
+import { isDashboardPeriod } from '../../dashboard.models';
 import { DashboardStore } from '../../dashboard.store';
 import type {
   ChartMarker,
@@ -237,6 +238,17 @@ export class ActivityChart implements OnDestroy {
 
   editMarker(marker: ChartMarker): void {
     this.openMarkerEditor(marker);
+  }
+
+  changePeriod(event: Event): void {
+    const target = event.target;
+
+    if (
+      target instanceof HTMLSelectElement &&
+      isDashboardPeriod(target.value)
+    ) {
+      this.store.setChartPeriod(target.value);
+    }
   }
 
   private openMarkerEditor(marker: ChartMarker | null): void {

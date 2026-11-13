@@ -20,6 +20,36 @@ describe('buildActivityChartData', () => {
     expect(result.labels[0]).toBe('2020-01-02');
     expect(result.labels.length).toBeGreaterThan(7);
   });
+
+  it('limits chart data to the selected number of days', () => {
+    const periods = [
+      ['7d', 7],
+      ['30d', 30],
+      ['90d', 90],
+    ] as const;
+
+    for (const [period, expectedDays] of periods) {
+      const result = buildActivityChartData(
+        DEFAULT_METRICS,
+        [{
+          id: 'old-event',
+          metricId: 'applications',
+          delta: 3,
+          createdAt: '2020-01-02T12:00:00',
+        }],
+        ['applications'],
+        [{
+          id: 'old-marker',
+          date: '2020-01-02',
+          description: 'Updated CV',
+        }],
+        period,
+      );
+
+      expect(result.labels).toHaveLength(expectedDays);
+      expect(result.labels[0]).not.toBe('2020-01-02');
+    }
+  });
 });
 
 describe('normalizeChartSeries', () => {
