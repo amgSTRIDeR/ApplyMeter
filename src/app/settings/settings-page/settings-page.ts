@@ -17,6 +17,7 @@ import {
 } from '@angular/material/dialog';
 
 import { CURRENT_SCHEMA_VERSION } from '../../dashboard/dashboard.defaults';
+import { parseLocalDate } from '../../dashboard/date-utils';
 import { DashboardStore } from '../../dashboard/dashboard.store';
 import type { PersistedAppState } from '../../dashboard/dashboard.models';
 
@@ -143,6 +144,7 @@ function isValidBackup(value: unknown): value is PersistedAppState {
 
   const metrics = value['metrics'];
   const events = value['events'];
+  const chartMarkers = value['chartMarkers'];
   const conversions = value['conversions'];
   const config = value['dashboardConfig'];
 
@@ -150,6 +152,7 @@ function isValidBackup(value: unknown): value is PersistedAppState {
     value['schemaVersion'] !== CURRENT_SCHEMA_VERSION ||
     !Array.isArray(metrics) ||
     !Array.isArray(events) ||
+    (chartMarkers !== undefined && !Array.isArray(chartMarkers)) ||
     !Array.isArray(conversions) ||
     !isRecord(config)
   ) {
@@ -212,6 +215,26 @@ function isValidBackup(value: unknown): value is PersistedAppState {
     }
 
     eventIds.add(event['id']);
+  }
+
+  const chartMarkerIds = new Set<string>();
+
+  for (const marker of (chartMarkers ?? []) as unknown[]) {
+    if (
+      !isRecord(marker) ||
+      typeof marker['id'] !== 'string' ||
+      marker['id'].length === 0 ||
+      typeof marker['date'] !== 'string' ||
+      !parseLocalDate(marker['date']) ||
+      typeof marker['description'] !== 'string' ||
+      marker['description'].trim().length === 0 ||
+      marker['description'].length > 120 ||
+      chartMarkerIds.has(marker['id'])
+    ) {
+      return false;
+    }
+
+    chartMarkerIds.add(marker['id']);
   }
 
   const conversionIds = new Set<string>();

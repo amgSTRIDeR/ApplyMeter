@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.chart-marker-editor {
+  width: 100%;
+}
+
+.chart-marker-editor__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding-top: 8px;
+}
+
+.chart-marker-editor__error {
+  margin: 0;
+
+  color: #b42318;
+  font-size: 13px;
+}
+
+mat-form-field {
+  width: 100%;
+}

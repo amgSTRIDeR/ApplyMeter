@@ -74,6 +74,7 @@ export function createDefaultAppState(): PersistedAppState {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     metrics: DEFAULT_METRICS.map((metric) => ({ ...metric })),
     events: [],
+    chartMarkers: [],
     conversions: DEFAULT_CONVERSIONS.map((conversion) => ({
       ...conversion,
     })),

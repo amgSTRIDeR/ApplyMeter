@@ -17,6 +17,12 @@ export interface MetricEvent {
   createdAt: string;
 }
 
+export interface ChartMarker {
+  id: string;
+  date: string;
+  description: string;
+}
+
 export interface Conversion {
   id: ConversionId;
   fromMetricId: MetricId;
@@ -36,6 +42,7 @@ export interface PersistedAppState {
   schemaVersion: number;
   metrics: Metric[];
   events: MetricEvent[];
+  chartMarkers?: ChartMarker[];
   conversions: Conversion[];
   dashboardConfig: DashboardConfig;
 }

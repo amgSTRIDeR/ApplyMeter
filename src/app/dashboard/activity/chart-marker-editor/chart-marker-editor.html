@@ -1,0 +1,58 @@
+<form
+  class="chart-marker-editor"
+  [formGroup]="form"
+  (ngSubmit)="save()"
+>
+  <h2 mat-dialog-title>
+    Add chart marker
+  </h2>
+
+  <mat-dialog-content>
+    <div class="chart-marker-editor__fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input
+          matInput
+          type="date"
+          formControlName="date"
+          [max]="today"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="description"
+          maxlength="120"
+          placeholder="For example, updated CV"
+        />
+      </mat-form-field>
+
+      @if (form.controls.date.value > today) {
+        <p class="chart-marker-editor__error">
+          The date cannot be in the future.
+        </p>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="cancel()"
+    >
+      Cancel
+    </button>
+
+    <button
+      mat-flat-button
+      type="submit"
+      [disabled]="!canSave()"
+    >
+      Add marker
+    </button>
+  </mat-dialog-actions>
+</form>

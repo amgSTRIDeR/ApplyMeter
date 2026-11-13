@@ -1,13 +1,16 @@
 import type {
+  ChartMarker,
   Metric,
   MetricEvent,
   MetricId,
 } from './dashboard.models';
+import { parseLocalDate } from './date-utils';
 
 export function buildActivityChartData(
   metrics: Metric[],
   events: MetricEvent[],
   selectedIds: MetricId[],
+  chartMarkers: ChartMarker[] = [],
 ) {
   const selectedMetrics = selectedIds
     .map((id) => metrics.find((metric) => metric.id === id))
@@ -24,6 +27,14 @@ export function buildActivityChartData(
     date.setHours(0, 0, 0, 0);
 
     if (date < firstDay) {
+      firstDay.setTime(date.getTime());
+    }
+  }
+
+  for (const marker of chartMarkers) {
+    const date = parseLocalDate(marker.date);
+
+    if (date && date < firstDay) {
       firstDay.setTime(date.getTime());
     }
   }

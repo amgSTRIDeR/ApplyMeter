@@ -11,11 +11,16 @@ const STORAGE_KEY = 'applymeter.state';
 export class ChromeStorage {
   async load(): Promise<PersistedAppState> {
     const result = await chrome.storage.local.get(STORAGE_KEY);
+    const state = result[STORAGE_KEY] as PersistedAppState | undefined;
 
-    return (
-      (result[STORAGE_KEY] as PersistedAppState | undefined) ??
-      createDefaultAppState()
-    );
+    if (!state) {
+      return createDefaultAppState();
+    }
+
+    return {
+      ...state,
+      chartMarkers: state.chartMarkers ?? [],
+    };
   }
 
   async save(state: PersistedAppState): Promise<void> {

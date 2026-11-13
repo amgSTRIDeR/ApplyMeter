@@ -2,23 +2,35 @@
   <header class="activity-chart__header">
     <h2>Activity</h2>
 
-    <button
-      mat-icon-button
-      type="button"
-      aria-label="Configure chart lines"
-      title="Configure chart lines"
-      (click)="openSettings()"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
+    <div class="activity-chart__actions">
+      <button
+        mat-button
+        type="button"
+        aria-label="Add chart marker"
+        title="Add chart marker"
+        (click)="addMarker()"
       >
-        <path d="M4 7h16" />
-        <circle cx="9" cy="7" r="2" />
-        <path d="M4 17h16" />
-        <circle cx="15" cy="17" r="2" />
-      </svg>
-    </button>
+        Add note
+      </button>
+
+      <button
+        mat-icon-button
+        type="button"
+        aria-label="Configure chart lines"
+        title="Configure chart lines"
+        (click)="openSettings()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M4 7h16" />
+          <circle cx="9" cy="7" r="2" />
+          <path d="M4 17h16" />
+          <circle cx="15" cy="17" r="2" />
+        </svg>
+      </button>
+    </div>
   </header>
 
   <p class="activity-chart__description">

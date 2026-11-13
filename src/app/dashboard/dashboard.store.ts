@@ -1,8 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { buildActivityChartData } from './dashboard.aggregations';
+import { getLocalDateString, parseLocalDate } from './date-utils';
 import { ChromeStorage } from '../persistence/chrome-storage';
 import { createDefaultAppState } from './dashboard.defaults';
 import type {
+  ChartMarker,
   Conversion,
   ConversionId,
   Metric,
@@ -67,6 +69,10 @@ export class DashboardStore {
     () => this.state().dashboardConfig.chartMetricIds,
   );
 
+  readonly chartMarkers = computed(
+    () => this.state().chartMarkers ?? [],
+  );
+
   readonly chartData = computed(() => {
     const state = this.state();
 
@@ -74,6 +80,7 @@ export class DashboardStore {
       state.metrics,
       state.events,
       state.dashboardConfig.chartMetricIds,
+      state.chartMarkers ?? [],
     );
   });
 
@@ -520,6 +527,37 @@ export class DashboardStore {
     this.persist();
   }
 
+  addChartMarker(data: Pick<ChartMarker, 'date' | 'description'>): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const date = data.date.trim();
+    const description = data.description.trim();
+
+    if (
+      !parseLocalDate(date) ||
+      date > getLocalDateString(new Date()) ||
+      !description ||
+      description.length > 120
+    ) {
+      return;
+    }
+
+    const marker: ChartMarker = {
+      id: crypto.randomUUID(),
+      date,
+      description,
+    };
+
+    this.state.update((state) => ({
+      ...state,
+      chartMarkers: [...(state.chartMarkers ?? []), marker],
+    }));
+
+    this.persist();
+  }
+
   exportData(): PersistedAppState {
     if (this.isLoading() || this.loadError()) {
       throw new Error('Dashboard is not ready.');
@@ -535,9 +573,14 @@ export class DashboardStore {
 
     await this.saveQueue;
 
-    await this.storage.save(data);
+    const normalizedData = {
+      ...data,
+      chartMarkers: data.chartMarkers ?? [],
+    };
 
-    this.state.set(data);
+    await this.storage.save(normalizedData);
+
+    this.state.set(normalizedData);
     this.saveError.set(false);
   }
 
