@@ -26,6 +26,7 @@ import type {
 export class MetricCard {
   readonly metric = input.required<Metric>();
   readonly value = input.required<number>();
+  readonly currentValue = input<number>(0);
 
   readonly increment = output<MetricId>();
   readonly decrement = output<MetricId>();

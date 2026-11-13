@@ -17,8 +17,10 @@
       mat-button
       type="button"
       class="app-header__period"
+      [matMenuTriggerFor]="metricsPeriodMenu"
+      [disabled]="store.isLoading() || store.loadError()"
     >
-      All time
+      {{ periodLabel() }}
 
       <span
         class="app-header__chevron"
@@ -86,4 +88,34 @@
       </svg>
     </a>
   </div>
+
+  <mat-menu #metricsPeriodMenu="matMenu">
+    <button
+      mat-menu-item
+      (click)="store.setMetricsPeriod('7d')"
+    >
+      Last 7 days
+    </button>
+
+    <button
+      mat-menu-item
+      (click)="store.setMetricsPeriod('30d')"
+    >
+      Last 30 days
+    </button>
+
+    <button
+      mat-menu-item
+      (click)="store.setMetricsPeriod('90d')"
+    >
+      Last 90 days
+    </button>
+
+    <button
+      mat-menu-item
+      (click)="store.setMetricsPeriod('all')"
+    >
+      All time
+    </button>
+  </mat-menu>
 </header>

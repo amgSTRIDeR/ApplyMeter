@@ -29,6 +29,7 @@
       <app-metric-card
         [metric]="metric"
         [value]="store.metricTotals().get(metric.id) ?? 0"
+        [currentValue]="store.allTimeMetricTotals().get(metric.id) ?? 0"
         (increment)="store.incrementMetric($event)"
         (decrement)="store.decrementMetric($event)"
         (edit)="editMetric($event)"

@@ -68,6 +68,7 @@ export const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
     'interviews-to-offers',
   ],
   period: 'all',
+  metricsPeriod: 'all',
 };
 
 export function createDefaultAppState(): PersistedAppState {

@@ -5,7 +5,10 @@ import type {
   MetricEvent,
   MetricId,
 } from './dashboard.models';
-import { parseLocalDate } from './date-utils';
+import {
+  getPeriodStartDate,
+  parseLocalDate,
+} from './date-utils';
 
 export function buildActivityChartData(
   metrics: Metric[],
@@ -21,17 +24,11 @@ export function buildActivityChartData(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const periodDays: Record<DashboardPeriod, number | null> = {
-    '7d': 7,
-    '30d': 30,
-    '90d': 90,
-    all: null,
-  };
-  const visibleDayCount = periodDays[period] ?? 7;
-  const firstDay = new Date(today);
-  firstDay.setDate(firstDay.getDate() - visibleDayCount + 1);
+  const firstDay = getPeriodStartDate(period, today) ?? new Date(today);
 
   if (period === 'all') {
+    firstDay.setDate(firstDay.getDate() - 6);
+
     for (const event of events) {
       const date = new Date(event.createdAt);
       date.setHours(0, 0, 0, 0);
@@ -101,6 +98,35 @@ export function buildActivityChartData(
       ),
     })),
   };
+}
+
+export function buildMetricTotals(
+  metrics: Metric[],
+  events: MetricEvent[],
+  period: DashboardPeriod = 'all',
+  referenceDate = new Date(),
+): Map<MetricId, number> {
+  const totals = new Map<MetricId, number>(
+    metrics.map((metric) => [metric.id, 0] as const),
+  );
+  const periodStart = getPeriodStartDate(period, referenceDate);
+
+  for (const event of events) {
+    if (
+      periodStart &&
+      new Date(event.createdAt) < periodStart
+    ) {
+      continue;
+    }
+
+    const total = totals.get(event.metricId);
+
+    if (total !== undefined) {
+      totals.set(event.metricId, total + event.delta);
+    }
+  }
+
+  return totals;
 }
 
 export function normalizeChartSeries(values: number[]): number[] {

@@ -281,6 +281,7 @@ function isValidBackup(value: unknown): value is PersistedAppState {
   const chartMetricIds = config['chartMetricIds'];
   const conversionOrder = config['conversionOrder'];
   const period = config['period'];
+  const metricsPeriod = config['metricsPeriod'];
 
   if (
     !isUniqueStringArray(metricOrder) ||
@@ -292,6 +293,10 @@ function isValidBackup(value: unknown): value is PersistedAppState {
 
   return (
     isDashboardPeriod(period) &&
+    (
+      metricsPeriod === undefined ||
+      isDashboardPeriod(metricsPeriod)
+    ) &&
     metricOrder.every((id) => metricIds.has(id)) &&
     [...activeIds].every((id) => metricOrder.includes(id)) &&
     chartMetricIds.every((id) => activeIds.has(id)) &&

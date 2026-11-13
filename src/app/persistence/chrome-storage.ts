@@ -4,7 +4,10 @@ import {
   createDefaultAppState,
   DEFAULT_CHART_MARKER_COLOR,
 } from '../dashboard/dashboard.defaults';
-import type { PersistedAppState } from '../dashboard/dashboard.models';
+import {
+  isDashboardPeriod,
+  type PersistedAppState,
+} from '../dashboard/dashboard.models';
 
 const STORAGE_KEY = 'applymeter.state';
 
@@ -22,6 +25,14 @@ export class ChromeStorage {
 
     return {
       ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        metricsPeriod: isDashboardPeriod(
+          state.dashboardConfig.metricsPeriod,
+        )
+          ? state.dashboardConfig.metricsPeriod
+          : 'all',
+      },
       chartMarkers: (state.chartMarkers ?? []).map((marker) => ({
         ...marker,
         color: marker.color ?? DEFAULT_CHART_MARKER_COLOR,

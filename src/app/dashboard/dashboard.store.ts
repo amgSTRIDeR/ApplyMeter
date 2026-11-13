@@ -1,6 +1,12 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { buildActivityChartData } from './dashboard.aggregations';
-import { getLocalDateString, parseLocalDate } from './date-utils';
+import {
+  buildActivityChartData,
+  buildMetricTotals,
+} from './dashboard.aggregations';
+import {
+  getLocalDateString,
+  parseLocalDate,
+} from './date-utils';
 import { ChromeStorage } from '../persistence/chrome-storage';
 import {
   createDefaultAppState,
@@ -51,24 +57,20 @@ export class DashboardStore {
       );
   });
 
+  readonly allTimeMetricTotals = computed(() => {
+    const state = this.state();
+
+    return buildMetricTotals(state.metrics, state.events);
+  });
+
   readonly metricTotals = computed(() => {
-    const { metrics, events } = this.state();
+    const state = this.state();
 
-    const totals = new Map<MetricId, number>();
-
-    for (const metric of metrics) {
-      totals.set(metric.id, 0);
-    }
-
-    for (const event of events) {
-      const current = totals.get(event.metricId);
-
-      if (current !== undefined) {
-        totals.set(event.metricId, current + event.delta);
-      }
-    }
-
-    return totals;
+    return buildMetricTotals(
+      state.metrics,
+      state.events,
+      state.dashboardConfig.metricsPeriod ?? 'all',
+    );
   });
 
   readonly chartMetricIds = computed(
@@ -77,6 +79,10 @@ export class DashboardStore {
 
   readonly chartPeriod = computed(
     () => this.state().dashboardConfig.period,
+  );
+
+  readonly metricsPeriod = computed(
+    () => this.state().dashboardConfig.metricsPeriod ?? 'all',
   );
 
   readonly chartMarkers = computed(
@@ -101,7 +107,7 @@ export class DashboardStore {
 
   readonly conversionRows = computed(() => {
     const state = this.state();
-    const totals = this.metricTotals();
+    const totals = this.allTimeMetricTotals();
 
     const metrics = new Map(
       state.metrics
@@ -227,6 +233,26 @@ export class DashboardStore {
             (id) => !visibleIds.has(id),
           ),
         ],
+      },
+    }));
+
+    this.persist();
+  }
+
+  setMetricsPeriod(period: DashboardPeriod): void {
+    if (
+      this.isLoading() ||
+      this.loadError() ||
+      !isDashboardPeriod(period)
+    ) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      dashboardConfig: {
+        ...state.dashboardConfig,
+        metricsPeriod: period,
       },
     }));
 
@@ -672,6 +698,11 @@ export class DashboardStore {
 
     const normalizedData = {
       ...data,
+      dashboardConfig: {
+        ...data.dashboardConfig,
+        metricsPeriod:
+          data.dashboardConfig.metricsPeriod ?? 'all',
+      },
       chartMarkers: (data.chartMarkers ?? []).map((marker) => ({
         ...marker,
         color: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
@@ -697,7 +728,8 @@ export class DashboardStore {
       return;
     }
 
-    const currentValue = this.metricTotals().get(metricId) ?? 0;
+    const currentValue =
+      this.allTimeMetricTotals().get(metricId) ?? 0;
 
     if (currentValue + delta < 0) {
       return;

@@ -75,7 +75,7 @@
       mat-icon-button
       type="button"
       class="metric-card__action metric-card__action--minus"
-      [disabled]="value() === 0"
+      [disabled]="currentValue() <= 0"
       [attr.aria-label]="'Decrease ' + metric().name"
       (click)="decrement.emit(metric().id)"
     >

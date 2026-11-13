@@ -12,6 +12,7 @@ Track applications, interviews, offers, and rejections in one place — with sim
 * Track rejections
 * Increment or decrement counters instantly
 * See daily activity charts for 7, 30, 90 days, or all time
+* Filter metric cards independently of the activity chart
 * Add, edit, and delete colored chart markers with descriptions shown on hover
 * View simple conversion statistics
 * Data is stored locally in your browser

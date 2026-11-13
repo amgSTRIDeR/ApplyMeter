@@ -53,6 +53,7 @@ export interface DashboardConfig {
   chartMetricIds: MetricId[];
   conversionOrder: ConversionId[];
   period: DashboardPeriod;
+  metricsPeriod?: DashboardPeriod;
 }
 
 export interface PersistedAppState {
