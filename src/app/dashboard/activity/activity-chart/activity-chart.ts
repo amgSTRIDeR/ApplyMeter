@@ -254,10 +254,18 @@ export class ActivityChart implements OnDestroy {
         return;
       }
 
+      if (result.action === 'delete') {
+        if (marker) {
+          this.store.deleteChartMarker(marker.id);
+        }
+
+        return;
+      }
+
       if (marker) {
-        this.store.updateChartMarker(marker.id, result);
+        this.store.updateChartMarker(marker.id, result.marker);
       } else {
-        this.store.addChartMarker(result);
+        this.store.addChartMarker(result.marker);
       }
     });
   }

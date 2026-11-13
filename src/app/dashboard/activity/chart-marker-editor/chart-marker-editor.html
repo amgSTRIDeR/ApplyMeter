@@ -48,6 +48,17 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
+    @if (data.marker) {
+      <button
+        mat-button
+        class="chart-marker-editor__delete"
+        type="button"
+        (click)="delete()"
+      >
+        Delete marker
+      </button>
+    }
+
     <button
       mat-button
       type="button"

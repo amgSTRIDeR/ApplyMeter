@@ -607,6 +607,27 @@ export class DashboardStore {
     this.persist();
   }
 
+  deleteChartMarker(markerId: ChartMarker['id']): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const markers = this.state().chartMarkers ?? [];
+
+    if (!markers.some((marker) => marker.id === markerId)) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      chartMarkers: (state.chartMarkers ?? []).filter(
+        (marker) => marker.id !== markerId,
+      ),
+    }));
+
+    this.persist();
+  }
+
   exportData(): PersistedAppState {
     if (this.isLoading() || this.loadError()) {
       throw new Error('Dashboard is not ready.');

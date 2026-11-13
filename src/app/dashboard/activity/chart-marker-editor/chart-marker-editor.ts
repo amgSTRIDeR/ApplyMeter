@@ -31,7 +31,9 @@ import type {
   ChartMarkerData,
 } from '../../dashboard.models';
 
-export type ChartMarkerEditorResult = ChartMarkerData;
+export type ChartMarkerEditorResult =
+  | { action: 'save'; marker: ChartMarkerData }
+  | { action: 'delete' };
 
 export interface ChartMarkerEditorData {
   marker: ChartMarker | null;
@@ -107,10 +109,19 @@ export class ChartMarkerEditor {
     const { date, description, color } = this.form.getRawValue();
 
     this.dialogRef.close({
-      date,
-      description: description.trim(),
-      color,
+      action: 'save',
+      marker: {
+        date,
+        description: description.trim(),
+        color,
+      },
     });
+  }
+
+  delete(): void {
+    if (this.data.marker) {
+      this.dialogRef.close({ action: 'delete' });
+    }
   }
 
   cancel(): void {
