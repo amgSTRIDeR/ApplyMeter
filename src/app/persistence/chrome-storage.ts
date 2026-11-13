@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { createDefaultAppState } from '../dashboard/dashboard.defaults';
+import {
+  createDefaultAppState,
+  DEFAULT_CHART_MARKER_COLOR,
+} from '../dashboard/dashboard.defaults';
 import type { PersistedAppState } from '../dashboard/dashboard.models';
 
 const STORAGE_KEY = 'applymeter.state';
@@ -19,7 +22,10 @@ export class ChromeStorage {
 
     return {
       ...state,
-      chartMarkers: state.chartMarkers ?? [],
+      chartMarkers: (state.chartMarkers ?? []).map((marker) => ({
+        ...marker,
+        color: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
+      })),
     };
   }
 

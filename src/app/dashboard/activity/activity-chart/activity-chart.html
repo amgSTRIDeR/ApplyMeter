@@ -62,5 +62,22 @@
         <span>{{ metric.name }}</span>
       </div>
     }
+
+    @for (marker of store.chartMarkers(); track marker.id) {
+      <button
+        class="activity-chart__legend-item activity-chart__legend-marker"
+        type="button"
+        [attr.aria-label]="'Edit chart marker: ' + marker.description"
+        title="Edit chart marker"
+        (click)="editMarker(marker)"
+      >
+        <span
+          class="activity-chart__legend-color"
+          [style.backgroundColor]="marker.color"
+        ></span>
+
+        <span>{{ marker.date }} · {{ marker.description }}</span>
+      </button>
+    }
   </div>
 </section>

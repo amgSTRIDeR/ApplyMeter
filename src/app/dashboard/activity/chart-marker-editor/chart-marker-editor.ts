@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 
 import {
+  MAT_DIALOG_DATA,
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
@@ -24,12 +25,17 @@ import {
   getLocalDateString,
   parseLocalDate,
 } from '../../date-utils';
-import type { ChartMarker } from '../../dashboard.models';
-
-export type ChartMarkerEditorResult = Pick<
+import { DEFAULT_CHART_MARKER_COLOR } from '../../dashboard.defaults';
+import type {
   ChartMarker,
-  'date' | 'description'
->;
+  ChartMarkerData,
+} from '../../dashboard.models';
+
+export type ChartMarkerEditorResult = ChartMarkerData;
+
+export interface ChartMarkerEditorData {
+  marker: ChartMarker | null;
+}
 
 @Component({
   selector: 'app-chart-marker-editor',
@@ -45,6 +51,8 @@ export type ChartMarkerEditorResult = Pick<
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartMarkerEditor {
+  readonly data = inject<ChartMarkerEditorData>(MAT_DIALOG_DATA);
+
   private readonly dialogRef = inject<
     MatDialogRef<ChartMarkerEditor, ChartMarkerEditorResult>
   >(MatDialogRef);
@@ -52,18 +60,32 @@ export class ChartMarkerEditor {
   readonly today = getLocalDateString(new Date());
 
   readonly form = new FormGroup({
-    date: new FormControl(this.today, {
+    date: new FormControl(this.data.marker?.date ?? this.today, {
       nonNullable: true,
       validators: [Validators.required],
     }),
 
-    description: new FormControl('', {
-      nonNullable: true,
-      validators: [
-        Validators.required,
-        Validators.maxLength(120),
-      ],
-    }),
+    description: new FormControl(
+      this.data.marker?.description ?? '',
+      {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.maxLength(120),
+        ],
+      },
+    ),
+
+    color: new FormControl(
+      this.data.marker?.color ?? DEFAULT_CHART_MARKER_COLOR,
+      {
+        nonNullable: true,
+        validators: [
+          Validators.required,
+          Validators.pattern(/^#[0-9a-fA-F]{6}$/),
+        ],
+      },
+    ),
   });
 
   canSave(): boolean {
@@ -82,11 +104,12 @@ export class ChartMarkerEditor {
       return;
     }
 
-    const { date, description } = this.form.getRawValue();
+    const { date, description, color } = this.form.getRawValue();
 
     this.dialogRef.close({
       date,
       description: description.trim(),
+      color,
     });
   }
 

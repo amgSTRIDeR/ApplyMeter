@@ -229,6 +229,13 @@ function isValidBackup(value: unknown): value is PersistedAppState {
       typeof marker['description'] !== 'string' ||
       marker['description'].trim().length === 0 ||
       marker['description'].length > 120 ||
+      (
+        marker['color'] !== undefined &&
+        (
+          typeof marker['color'] !== 'string' ||
+          !/^#[0-9a-fA-F]{6}$/.test(marker['color'])
+        )
+      ) ||
       chartMarkerIds.has(marker['id'])
     ) {
       return false;

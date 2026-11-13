@@ -4,7 +4,7 @@
   (ngSubmit)="save()"
 >
   <h2 mat-dialog-title>
-    Add chart marker
+    {{ data.marker ? 'Edit chart marker' : 'Add chart marker' }}
   </h2>
 
   <mat-dialog-content>
@@ -30,6 +30,15 @@
         />
       </mat-form-field>
 
+      <label class="chart-marker-editor__color">
+        <span>Marker color</span>
+        <input
+          type="color"
+          formControlName="color"
+          aria-label="Marker color"
+        />
+      </label>
+
       @if (form.controls.date.value > today) {
         <p class="chart-marker-editor__error">
           The date cannot be in the future.
@@ -52,7 +61,7 @@
       type="submit"
       [disabled]="!canSave()"
     >
-      Add marker
+      {{ data.marker ? 'Save changes' : 'Add marker' }}
     </button>
   </mat-dialog-actions>
 </form>

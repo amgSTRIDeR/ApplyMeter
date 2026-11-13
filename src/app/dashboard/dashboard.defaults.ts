@@ -6,6 +6,7 @@ import {
 } from './dashboard.models';
 
 export const CURRENT_SCHEMA_VERSION = 1;
+export const DEFAULT_CHART_MARKER_COLOR = '#d49b28';
 
 export const DEFAULT_METRICS: Metric[] = [
   {

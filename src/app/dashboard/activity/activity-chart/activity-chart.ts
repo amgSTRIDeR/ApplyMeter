@@ -15,8 +15,12 @@ import Chart from 'chart.js/auto';
 import type { ChartDataset, Plugin } from 'chart.js';
 
 import { normalizeChartSeries } from '../../dashboard.aggregations';
+import { DEFAULT_CHART_MARKER_COLOR } from '../../dashboard.defaults';
 import { DashboardStore } from '../../dashboard.store';
-import type { MetricId } from '../../dashboard.models';
+import type {
+  ChartMarker,
+  MetricId,
+} from '../../dashboard.models';
 
 import {
   ChartSettings,
@@ -24,6 +28,7 @@ import {
 } from '../chart-settings/chart-settings';
 import {
   ChartMarkerEditor,
+  type ChartMarkerEditorData,
   type ChartMarkerEditorResult,
 } from '../chart-marker-editor/chart-marker-editor';
 
@@ -35,23 +40,28 @@ const chartMarkerLines: Plugin<'line'> = {
     );
     const xScale = chart.scales['x'];
     const { top, bottom } = chart.chartArea;
-    const positions = new Set<number>();
+    const positions = new Map<number, string>();
     const { ctx } = chart;
 
     for (const dataset of markerDatasets) {
       dataset.data.forEach((value, index) => {
         if (value !== null) {
-          positions.add(xScale.getPixelForValue(index));
+          positions.set(
+            xScale.getPixelForValue(index),
+            typeof dataset.borderColor === 'string'
+              ? dataset.borderColor
+              : DEFAULT_CHART_MARKER_COLOR,
+          );
         }
       });
     }
 
     ctx.save();
-    ctx.strokeStyle = '#d49b28';
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
 
-    for (const x of positions) {
+    for (const [x, color] of positions) {
+      ctx.strokeStyle = color;
       ctx.beginPath();
       ctx.moveTo(x, top);
       ctx.lineTo(x, bottom);
@@ -114,8 +124,8 @@ export class ActivityChart implements OnDestroy {
               : null,
           ),
           yAxisID: 'yMarkers',
-          borderColor: '#d49b28',
-          backgroundColor: '#d49b28',
+          borderColor: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
+          backgroundColor: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
           showLine: false,
           pointStyle: 'rectRot' as const,
           pointRadius: 5,
@@ -222,17 +232,32 @@ export class ActivityChart implements OnDestroy {
   }
 
   addMarker(): void {
+    this.openMarkerEditor(null);
+  }
+
+  editMarker(marker: ChartMarker): void {
+    this.openMarkerEditor(marker);
+  }
+
+  private openMarkerEditor(marker: ChartMarker | null): void {
     const dialogRef = this.dialog.open<
       ChartMarkerEditor,
-      undefined,
+      ChartMarkerEditorData,
       ChartMarkerEditorResult
     >(ChartMarkerEditor, {
       width: '400px',
+      data: { marker },
     });
 
-    dialogRef.afterClosed().subscribe((marker) => {
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) {
+        return;
+      }
+
       if (marker) {
-        this.store.addChartMarker(marker);
+        this.store.updateChartMarker(marker.id, result);
+      } else {
+        this.store.addChartMarker(result);
       }
     });
   }

@@ -21,7 +21,15 @@ export interface ChartMarker {
   id: string;
   date: string;
   description: string;
+  color?: string;
 }
+
+export type ChartMarkerData = Pick<
+  ChartMarker,
+  'date' | 'description'
+> & {
+  color: string;
+};
 
 export interface Conversion {
   id: ConversionId;

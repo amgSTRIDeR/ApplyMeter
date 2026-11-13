@@ -12,7 +12,7 @@ Track applications, interviews, offers, and rejections in one place — with sim
 * Track rejections
 * Increment or decrement counters instantly
 * See activity for the last 7 days
-* Add dated chart markers with descriptions shown on hover
+* Add and edit colored chart markers with descriptions shown on hover
 * View simple conversion statistics
 * Data is stored locally in your browser
 * No account required

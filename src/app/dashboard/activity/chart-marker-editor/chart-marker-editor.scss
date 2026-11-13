@@ -24,3 +24,26 @@
 mat-form-field {
   width: 100%;
 }
+
+.chart-marker-editor__color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  min-height: 40px;
+
+  color: #555b6a;
+  font-size: 14px;
+
+  input {
+    width: 44px;
+    height: 32px;
+    padding: 2px;
+
+    border: 1px solid #d5d8e0;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+  }
+}

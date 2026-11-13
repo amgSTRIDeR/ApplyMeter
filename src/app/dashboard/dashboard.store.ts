@@ -2,9 +2,13 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { buildActivityChartData } from './dashboard.aggregations';
 import { getLocalDateString, parseLocalDate } from './date-utils';
 import { ChromeStorage } from '../persistence/chrome-storage';
-import { createDefaultAppState } from './dashboard.defaults';
+import {
+  createDefaultAppState,
+  DEFAULT_CHART_MARKER_COLOR,
+} from './dashboard.defaults';
 import type {
   ChartMarker,
+  ChartMarkerData,
   Conversion,
   ConversionId,
   Metric,
@@ -70,7 +74,11 @@ export class DashboardStore {
   );
 
   readonly chartMarkers = computed(
-    () => this.state().chartMarkers ?? [],
+    () =>
+      (this.state().chartMarkers ?? []).map((marker) => ({
+        ...marker,
+        color: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
+      })),
   );
 
   readonly chartData = computed(() => {
@@ -527,7 +535,7 @@ export class DashboardStore {
     this.persist();
   }
 
-  addChartMarker(data: Pick<ChartMarker, 'date' | 'description'>): void {
+  addChartMarker(data: ChartMarkerData): void {
     if (this.isLoading() || this.loadError()) {
       return;
     }
@@ -539,7 +547,8 @@ export class DashboardStore {
       !parseLocalDate(date) ||
       date > getLocalDateString(new Date()) ||
       !description ||
-      description.length > 120
+      description.length > 120 ||
+      !/^#[0-9a-fA-F]{6}$/.test(data.color)
     ) {
       return;
     }
@@ -548,11 +557,51 @@ export class DashboardStore {
       id: crypto.randomUUID(),
       date,
       description,
+      color: data.color,
     };
 
     this.state.update((state) => ({
       ...state,
       chartMarkers: [...(state.chartMarkers ?? []), marker],
+    }));
+
+    this.persist();
+  }
+
+  updateChartMarker(
+    markerId: ChartMarker['id'],
+    data: ChartMarkerData,
+  ): void {
+    if (this.isLoading() || this.loadError()) {
+      return;
+    }
+
+    const date = data.date.trim();
+    const description = data.description.trim();
+
+    if (
+      !this.state().chartMarkers?.some((marker) => marker.id === markerId) ||
+      !parseLocalDate(date) ||
+      date > getLocalDateString(new Date()) ||
+      !description ||
+      description.length > 120 ||
+      !/^#[0-9a-fA-F]{6}$/.test(data.color)
+    ) {
+      return;
+    }
+
+    this.state.update((state) => ({
+      ...state,
+      chartMarkers: (state.chartMarkers ?? []).map((marker) =>
+        marker.id === markerId
+          ? {
+              ...marker,
+              date,
+              description,
+              color: data.color,
+            }
+          : marker,
+      ),
     }));
 
     this.persist();
@@ -575,7 +624,10 @@ export class DashboardStore {
 
     const normalizedData = {
       ...data,
-      chartMarkers: data.chartMarkers ?? [],
+      chartMarkers: (data.chartMarkers ?? []).map((marker) => ({
+        ...marker,
+        color: marker.color ?? DEFAULT_CHART_MARKER_COLOR,
+      })),
     };
 
     await this.storage.save(normalizedData);
