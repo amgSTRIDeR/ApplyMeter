@@ -3,6 +3,11 @@
   "name": "ApplyMeter",
   "version": "0.1.0",
   "description": "Track job applications, interviews, offers and conversion metrics.",
+  "icons": {
+    "16": "applymeter-icon.png",
+    "48": "applymeter-icon.png",
+    "128": "applymeter-icon.png"
+  },
   "permissions": ["storage", "alarms", "contextMenus"],
   "background": {
     "service_worker": "background.js"
@@ -18,6 +23,7 @@
   },
   "action": {
     "default_title": "ApplyMeter",
+    "default_icon": "applymeter-icon.png",
     "default_popup": "index.html"
   }
 }
