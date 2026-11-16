@@ -106,9 +106,12 @@ export class SettingsPage {
       )
         ? configuredHotkeyMetricId
         : defaultMetricId;
-      const nextBadgeMetricId = activeMetricIds.has(configuredBadgeMetricId)
-        ? configuredBadgeMetricId
-        : defaultMetricId;
+      const nextBadgeMetricId =
+        configuredBadgeMetricId === 'none'
+          ? 'none'
+          : activeMetricIds.has(configuredBadgeMetricId)
+            ? configuredBadgeMetricId
+            : (defaultMetricId || 'none');
 
       this.availableMetrics.set(metrics);
       this.toolbarAction.set(toolbarAction);
@@ -209,6 +212,7 @@ export class SettingsPage {
     const metricId = (event.target as HTMLSelectElement).value;
 
     if (
+      metricId !== 'none' &&
       !this.availableMetrics().some(
         (metric) => metric.id === metricId,
       )

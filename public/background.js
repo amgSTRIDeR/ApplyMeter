@@ -276,9 +276,12 @@ async function updateBadge() {
   const metricId =
     stored[BADGE_METRIC_KEY] ?? APPLICATION_METRIC_ID;
   const period = stored[BADGE_PERIOD_KEY] ?? 'today';
-  const metric = state.metrics.find(
-    (item) => item.id === metricId && !item.archived,
-  );
+  const metric =
+    metricId === 'none'
+      ? undefined
+      : state.metrics.find(
+          (item) => item.id === metricId && !item.archived,
+        );
   const now = new Date();
   const periodStart = getBadgePeriodStart(period, now);
   const total = metric

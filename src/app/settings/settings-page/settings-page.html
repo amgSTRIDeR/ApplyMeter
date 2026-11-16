@@ -89,11 +89,11 @@
       [value]="badgeMetricId()"
       [disabled]="
         isLoadingQuickActions() ||
-        isSavingQuickActions() ||
-        availableMetrics().length === 0
+        isSavingQuickActions()
       "
       (change)="updateBadgeMetric($event)"
     >
+      <option value="none">Don't show counter</option>
       @for (metric of availableMetrics(); track metric.id) {
         <option [value]="metric.id">
           {{ metric.name }}

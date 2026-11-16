@@ -100,6 +100,10 @@ export class ChromeStorage {
     await chrome.storage.local.set({
       [BADGE_METRIC_KEY]: metricId,
     });
+
+    if (metricId === 'none') {
+      await chrome.action.setBadgeText({ text: '' });
+    }
   }
 
   async loadBadgePeriod(): Promise<BadgePeriod> {
