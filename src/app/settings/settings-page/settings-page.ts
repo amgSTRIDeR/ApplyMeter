@@ -18,9 +18,24 @@ import {
 
 import { CURRENT_SCHEMA_VERSION } from '../../dashboard/dashboard.defaults';
 import { parseLocalDate } from '../../dashboard/date-utils';
-import { isDashboardPeriod } from '../../dashboard/dashboard.models';
+import {
+  isBadgePeriod,
+  isDashboardPeriod,
+} from '../../dashboard/dashboard.models';
+import type {
+  BadgePeriod,
+  Metric,
+} from '../../dashboard/dashboard.models';
 import { DashboardStore } from '../../dashboard/dashboard.store';
+import { ChromeStorage } from '../../persistence/chrome-storage';
+import type { ToolbarAction } from '../../persistence/chrome-storage';
 import type { PersistedAppState } from '../../dashboard/dashboard.models';
+
+interface ShortcutAssignment {
+  shortcut: string;
+}
+
+const HOTKEY_COMMAND = 'increment-applications';
 
 @Component({
   selector: 'app-settings-page',
@@ -36,6 +51,7 @@ import type { PersistedAppState } from '../../dashboard/dashboard.models';
 export class SettingsPage {
   readonly store = inject(DashboardStore);
 
+  private readonly chromeStorage = inject(ChromeStorage);
   private readonly dialog = inject(MatDialog);
 
   private readonly confirmation =
@@ -44,6 +60,200 @@ export class SettingsPage {
   readonly isImporting = signal(false);
   readonly successMessage = signal('');
   readonly errorMessage = signal('');
+  readonly availableMetrics = signal<Metric[]>([]);
+  readonly toolbarAction = signal<ToolbarAction>('open-widget');
+  readonly hotkeyMetricId = signal('applications');
+  readonly badgeMetricId = signal('');
+  readonly badgePeriod = signal<BadgePeriod>('today');
+  readonly shortcutAssignment =
+    signal<ShortcutAssignment | null>(null);
+  readonly isLoadingQuickActions = signal(true);
+  readonly isSavingQuickActions = signal(false);
+  readonly quickActionsError = signal('');
+  readonly shortcutError = signal('');
+
+  constructor() {
+    void this.loadQuickActions();
+  }
+
+  private async loadQuickActions(): Promise<void> {
+    try {
+      const [
+        state,
+        toolbarAction,
+        configuredHotkeyMetricId,
+        configuredBadgeMetricId,
+        configuredBadgePeriod,
+      ] =
+        await Promise.all([
+          this.chromeStorage.load(),
+          this.chromeStorage.loadToolbarAction(),
+          this.chromeStorage.loadHotkeyMetricId(),
+          this.chromeStorage.loadBadgeMetricId(),
+          this.chromeStorage.loadBadgePeriod(),
+        ]);
+      const metrics = state.metrics.filter(
+        (metric) => !metric.archived,
+      );
+      const activeMetricIds = new Set(
+        metrics.map((metric) => metric.id),
+      );
+      const defaultMetricId = activeMetricIds.has('applications')
+        ? 'applications'
+        : (metrics[0]?.id ?? '');
+      const nextHotkeyMetricId = activeMetricIds.has(
+        configuredHotkeyMetricId,
+      )
+        ? configuredHotkeyMetricId
+        : defaultMetricId;
+      const nextBadgeMetricId = activeMetricIds.has(configuredBadgeMetricId)
+        ? configuredBadgeMetricId
+        : defaultMetricId;
+
+      this.availableMetrics.set(metrics);
+      this.toolbarAction.set(toolbarAction);
+      this.hotkeyMetricId.set(nextHotkeyMetricId);
+      this.badgeMetricId.set(nextBadgeMetricId);
+      this.badgePeriod.set(configuredBadgePeriod);
+
+      if (configuredHotkeyMetricId !== nextHotkeyMetricId) {
+        await this.chromeStorage.saveHotkeyMetricId(
+          nextHotkeyMetricId,
+        );
+      }
+
+      if (configuredBadgeMetricId !== nextBadgeMetricId) {
+        await this.chromeStorage.saveBadgeMetricId(
+          nextBadgeMetricId,
+        );
+      }
+    } catch {
+      this.quickActionsError.set(
+        'Failed to load quick action settings.',
+      );
+    } finally {
+      this.isLoadingQuickActions.set(false);
+    }
+
+    await this.loadShortcutAssignments();
+  }
+
+  private async loadShortcutAssignments(): Promise<void> {
+    try {
+      const commands = await chrome.commands.getAll();
+      const command = commands.find(
+        (item) => item.name === HOTKEY_COMMAND,
+      );
+
+      if (!command) {
+        throw new Error('Hotkey command is not registered.');
+      }
+
+      this.shortcutAssignment.set({
+        shortcut: command.shortcut || 'Not assigned',
+      });
+    } catch {
+      this.shortcutError.set('Could not read keyboard shortcuts.');
+    }
+  }
+
+  async updateToolbarAction(event: Event): Promise<void> {
+    const value = (event.target as HTMLSelectElement).value;
+
+    if (value !== 'open-widget' && value !== 'increment-metric') {
+      this.quickActionsError.set('Select a valid toolbar action.');
+      return;
+    }
+
+    this.isSavingQuickActions.set(true);
+    this.quickActionsError.set('');
+
+    try {
+      await this.chromeStorage.saveToolbarAction(value);
+      this.toolbarAction.set(value);
+    } catch {
+      this.quickActionsError.set('Failed to save toolbar action.');
+    } finally {
+      this.isSavingQuickActions.set(false);
+    }
+  }
+
+  async updateHotkeyMetric(event: Event): Promise<void> {
+    const metricId = (event.target as HTMLSelectElement).value;
+
+    if (
+      !this.availableMetrics().some(
+        (metric) => metric.id === metricId,
+      )
+    ) {
+      this.quickActionsError.set('Select a valid metric.');
+      return;
+    }
+
+    this.isSavingQuickActions.set(true);
+    this.quickActionsError.set('');
+
+    try {
+      await this.chromeStorage.saveHotkeyMetricId(metricId);
+      this.hotkeyMetricId.set(metricId);
+    } catch {
+      this.quickActionsError.set(
+        'Failed to save the keyboard shortcut metric.',
+      );
+    } finally {
+      this.isSavingQuickActions.set(false);
+    }
+  }
+
+  async updateBadgeMetric(event: Event): Promise<void> {
+    const metricId = (event.target as HTMLSelectElement).value;
+
+    if (
+      !this.availableMetrics().some(
+        (metric) => metric.id === metricId,
+      )
+    ) {
+      this.quickActionsError.set('Select a valid badge metric.');
+      return;
+    }
+
+    this.isSavingQuickActions.set(true);
+    this.quickActionsError.set('');
+
+    try {
+      await this.chromeStorage.saveBadgeMetricId(metricId);
+      this.badgeMetricId.set(metricId);
+    } catch {
+      this.quickActionsError.set(
+        'Failed to save the badge metric.',
+      );
+    } finally {
+      this.isSavingQuickActions.set(false);
+    }
+  }
+
+  async updateBadgePeriod(event: Event): Promise<void> {
+    const period = (event.target as HTMLSelectElement).value;
+
+    if (!isBadgePeriod(period)) {
+      this.quickActionsError.set('Select a valid badge period.');
+      return;
+    }
+
+    this.isSavingQuickActions.set(true);
+    this.quickActionsError.set('');
+
+    try {
+      await this.chromeStorage.saveBadgePeriod(period);
+      this.badgePeriod.set(period);
+    } catch {
+      this.quickActionsError.set(
+        'Failed to save the badge period.',
+      );
+    } finally {
+      this.isSavingQuickActions.set(false);
+    }
+  }
 
   exportData(): void {
     try {

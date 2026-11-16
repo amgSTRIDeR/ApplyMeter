@@ -11,6 +11,8 @@ Track applications, interviews, offers, and rejections in one place — with sim
 * Track offers
 * Track rejections
 * Increment or decrement counters instantly
+* Increment metrics from the dashboard, one keyboard shortcut, or context menu
+* Display a selected metric's total for a chosen period on the extension icon
 * See daily activity charts for 7, 30, 90 days, or all time
 * Filter metric cards independently of the activity chart
 * Add, edit, and delete colored chart markers with descriptions shown on hover
@@ -26,6 +28,12 @@ ApplyMeter is local-first.
 Your job search statistics are stored using `chrome.storage.local` and remain on your device.
 
 ApplyMeter does not require access to your browsing history, job boards, emails, or personal accounts.
+
+In Settings, choose whether the extension icon opens the dashboard widget
+or increments a metric, select the metric for the keyboard shortcut, and
+choose the metric and period shown on the icon. Chrome manages shortcut assignments at
+`chrome://extensions/shortcuts`. Right-click a page or the extension icon
+to increment any active metric from the context menu.
 
 ## Tech Stack
 

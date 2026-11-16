@@ -48,6 +48,64 @@
   color: #555b6a;
 }
 
+.settings-page__label {
+  display: block;
+  margin-bottom: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #555b6a;
+}
+
+.settings-page__subheading {
+  margin: 24px 0 12px;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #202435;
+}
+
+.settings-page select {
+  box-sizing: border-box;
+  min-width: 260px;
+  padding: 8px 10px;
+
+  border: 1px solid #c9cbd4;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #202435;
+  font: inherit;
+}
+
+.settings-page__shortcut-list {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.settings-page__shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  & + & {
+    margin-top: 12px;
+  }
+
+  kbd {
+    padding: 2px 6px;
+
+    border: 1px solid #d5d7df;
+    border-radius: 4px;
+    background: #f7f7fa;
+    color: #202435;
+  }
+}
+
+.settings-page > a {
+  font-size: 13px;
+}
+
 .settings-page__actions {
   display: flex;
   align-items: center;

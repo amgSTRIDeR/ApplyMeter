@@ -38,6 +38,11 @@ export interface Conversion {
 }
 
 export type DashboardPeriod = '7d' | '30d' | '90d' | 'all';
+export type BadgePeriod = 'today' | DashboardPeriod;
+
+export function isBadgePeriod(value: unknown): value is BadgePeriod {
+  return value === 'today' || isDashboardPeriod(value);
+}
 
 export function isDashboardPeriod(value: unknown): value is DashboardPeriod {
   return (

@@ -8,6 +8,128 @@
   </header>
 
   <section class="settings-page__section">
+    <h3>Quick actions</h3>
+
+    <p class="settings-page__description">
+      Choose how the extension icon behaves and which metric quick
+      actions increase.
+    </p>
+
+    <label class="settings-page__label" for="toolbar-action">
+      Clicking the extension icon
+    </label>
+
+    <select
+      id="toolbar-action"
+      [value]="toolbarAction()"
+      [disabled]="isLoadingQuickActions() || isSavingQuickActions()"
+      (change)="updateToolbarAction($event)"
+    >
+      <option value="open-widget">Open the dashboard widget</option>
+      <option value="increment-metric">Increase the selected metric</option>
+    </select>
+
+    <label class="settings-page__label" for="hotkey-metric">
+      Metric for keyboard shortcuts and quick increment
+    </label>
+
+    <select
+      id="hotkey-metric"
+      [value]="hotkeyMetricId()"
+      [disabled]="
+        isLoadingQuickActions() ||
+        isSavingQuickActions() ||
+        availableMetrics().length === 0
+      "
+      (change)="updateHotkeyMetric($event)"
+    >
+      @for (metric of availableMetrics(); track metric.id) {
+        <option [value]="metric.id">
+          {{ metric.name }}
+        </option>
+      }
+    </select>
+
+    <p class="settings-page__description">
+      The single keyboard shortcut increases this metric. Assign its
+      key combination in Chrome.
+    </p>
+
+    <div class="settings-page__shortcut-row">
+      <span>Current shortcut</span>
+      <kbd>{{ shortcutAssignment()?.shortcut ?? 'Loading...' }}</kbd>
+    </div>
+
+    @if (shortcutError()) {
+      <p class="settings-page__error" role="alert">
+        {{ shortcutError() }}
+      </p>
+    }
+
+    <a
+      href="chrome://extensions/shortcuts"
+      target="_blank"
+      rel="noopener"
+    >
+      Assign or change key combinations in Chrome
+    </a>
+
+    <p class="settings-page__description">
+      Right-click a page or the extension icon to increase any active metric.
+    </p>
+
+    <h3 class="settings-page__subheading">Extension icon counter</h3>
+
+    <label class="settings-page__label" for="badge-metric">
+      Metric shown on the icon
+    </label>
+
+    <select
+      id="badge-metric"
+      [value]="badgeMetricId()"
+      [disabled]="
+        isLoadingQuickActions() ||
+        isSavingQuickActions() ||
+        availableMetrics().length === 0
+      "
+      (change)="updateBadgeMetric($event)"
+    >
+      @for (metric of availableMetrics(); track metric.id) {
+        <option [value]="metric.id">
+          {{ metric.name }}
+        </option>
+      }
+    </select>
+
+    <label class="settings-page__label" for="badge-period">
+      Period shown on the icon
+    </label>
+
+    <select
+      id="badge-period"
+      [value]="badgePeriod()"
+      [disabled]="isLoadingQuickActions() || isSavingQuickActions()"
+      (change)="updateBadgePeriod($event)"
+    >
+      <option value="today">Today</option>
+      <option value="7d">Last 7 days</option>
+      <option value="30d">Last 30 days</option>
+      <option value="90d">Last 90 days</option>
+      <option value="all">All time</option>
+    </select>
+
+    <p class="settings-page__description">
+      The icon shows the metric's net total for the selected period.
+    </p>
+
+    @if (quickActionsError()) {
+      <p class="settings-page__error" role="alert">
+        {{ quickActionsError() }}
+      </p>
+    }
+  </section>
+
+  <section class="settings-page__section">
     <h3>Backup & Restore</h3>
 
     <p class="settings-page__description">

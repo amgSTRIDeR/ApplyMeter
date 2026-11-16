@@ -3,7 +3,19 @@
   "name": "ApplyMeter",
   "version": "0.1.0",
   "description": "Track job applications, interviews, offers and conversion metrics.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "alarms", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "increment-applications": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "MacCtrl+Shift+Y"
+      },
+      "description": "Increase the selected metric"
+    }
+  },
   "action": {
     "default_title": "ApplyMeter",
     "default_popup": "index.html"
