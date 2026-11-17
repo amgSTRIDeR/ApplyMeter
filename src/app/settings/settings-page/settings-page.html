@@ -137,6 +137,18 @@
       activity history, conversions, and dashboard settings.
     </p>
 
+    <input
+      #backupFile
+      type="file"
+      accept=".json,application/json"
+      hidden
+      (change)="onBackupFileSelected($event)"
+    />
+
+    <p class="settings-page__description">
+      Choose a backup JSON file to restore. Importing replaces all current data.
+    </p>
+
     <div class="settings-page__actions">
       <button
         mat-stroked-button
@@ -147,18 +159,14 @@
         Export data
       </button>
 
-      <input
-        #backupFile
-        type="file"
-        accept=".json,application/json"
-        hidden
-        (change)="onFileSelected($event)"
-      />
-
       <button
         mat-flat-button
         type="button"
-        [disabled]="store.isLoading() || store.loadError() || isImporting()"
+        [disabled]="
+          store.isLoading() ||
+          store.loadError() ||
+          isImporting()
+        "
         (click)="backupFile.click()"
       >
         {{ isImporting() ? 'Importing...' : 'Import data' }}
@@ -178,43 +186,3 @@
     }
   </section>
 </section>
-
-<ng-template #confirmImport>
-  <h2 mat-dialog-title>
-    Restore backup?
-  </h2>
-
-  <mat-dialog-content>
-    <p>
-      Importing this backup will replace all current
-      ApplyMeter data.
-    </p>
-
-    <p>
-      This includes your metrics, activity history,
-      conversions, and dashboard settings.
-    </p>
-
-    <p>
-      Export your current data first if you want to keep it.
-    </p>
-  </mat-dialog-content>
-
-  <mat-dialog-actions align="end">
-    <button
-      mat-button
-      type="button"
-      mat-dialog-close
-    >
-      Cancel
-    </button>
-
-    <button
-      mat-flat-button
-      type="button"
-      [mat-dialog-close]="true"
-    >
-      Import
-    </button>
-  </mat-dialog-actions>
-</ng-template>

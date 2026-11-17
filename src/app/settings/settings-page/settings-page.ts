@@ -3,18 +3,11 @@ import {
   Component,
   inject,
   signal,
-  TemplateRef,
-  viewChild,
 } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MatDialog,
-  MatDialogModule,
-} from '@angular/material/dialog';
 
 import { CURRENT_SCHEMA_VERSION } from '../../dashboard/dashboard.defaults';
 import { parseLocalDate } from '../../dashboard/date-utils';
@@ -42,7 +35,6 @@ const HOTKEY_COMMAND = 'increment-applications';
   imports: [
     RouterLink,
     MatButtonModule,
-    MatDialogModule,
   ],
   templateUrl: './settings-page.html',
   styleUrl: './settings-page.scss',
@@ -52,10 +44,6 @@ export class SettingsPage {
   readonly store = inject(DashboardStore);
 
   private readonly chromeStorage = inject(ChromeStorage);
-  private readonly dialog = inject(MatDialog);
-
-  private readonly confirmation =
-    viewChild.required<TemplateRef<unknown>>('confirmImport');
 
   readonly isImporting = signal(false);
   readonly successMessage = signal('');
@@ -287,7 +275,7 @@ export class SettingsPage {
     }
   }
 
-  async onFileSelected(event: Event): Promise<void> {
+  async onBackupFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
 
@@ -302,21 +290,10 @@ export class SettingsPage {
     this.successMessage.set('');
 
     try {
-      const content = await file.text();
-      const data: unknown = JSON.parse(content);
+      const data: unknown = JSON.parse(await file.text());
 
       if (!isValidBackup(data)) {
         throw new Error('Invalid or unsupported backup file.');
-      }
-
-      const confirmed = await firstValueFrom(
-        this.dialog.open(this.confirmation(), {
-          width: '420px',
-        }).afterClosed(),
-      );
-
-      if (confirmed !== true) {
-        return;
       }
 
       await this.store.importData(data);
